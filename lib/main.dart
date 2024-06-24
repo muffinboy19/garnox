@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/pages/blank.dart';
 import 'package:untitled1/pages/home.dart';
+import 'package:untitled1/pages/landingPage.dart';
 import 'package:untitled1/pages/userdetailgetter.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
@@ -30,7 +31,12 @@ Future<void> main() async {
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
-  runApp(MyApp());
+  runApp(SafeArea(
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home : Landingpage()
+      )
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -59,7 +65,7 @@ class _MyAppState extends State<MyApp> {
         primaryIconTheme: IconThemeData(color: Colors.white),
         indicatorColor: Constants.WHITE,
         primaryTextTheme: TextTheme(
-          headline6: TextStyle(color: Colors.white),
+          headlineMedium: TextStyle(color: Colors.white),
         ),
         tabBarTheme: TabBarTheme(
           labelColor: Constants.WHITE,
