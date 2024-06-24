@@ -22,17 +22,17 @@ Future<void> main() async {
   try {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyALEs8MkfSicwkgA9j4ydSFXdy1_eBjRUQ",
-        appId: '1:894578754844:android:73a6c032950fc8e1daa6d9',
-        messagingSenderId: "894578754844",
-        projectId: "sembreaker-dc528",
+        apiKey: "AIzaSyBLysTDQ5ZZYfGy5EB1hzr6UpMNss2U33Q",
+        appId: '1:713083156511:android:61ad2890f9d3d219fb3d2a',
+        messagingSenderId: "713083156511",
+        projectId: "sembreaker-49515",
       ),
     );
-    print('Firebase initialized successfully');
+    print('[FIREBASE] Firebase initialized successfully');
 
     // Introduce a delay before calling set()
     // await Future.delayed(Duration(milliseconds: 500)); // Adjust delay as needed
-    set(); // Assuming 'set()' is defined elsewhere
+    //set(); // Assuming 'set()' is defined elsewhere
   } catch (e) {
     print('Error initializing Firebase:$e');
   }
@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? Home() : Home();
+            return snapshot.data! ? SemsiterAskingPage() : Home();
           } else {
             return Blank();
           }

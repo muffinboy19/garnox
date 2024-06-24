@@ -15,20 +15,20 @@ import '../utils/contstants.dart';
 import 'package:get_it/get_it.dart';
 
 
-class CallService {
-  void call(String number) => launch("tel:$number");
-}
+// class CallService {
+//   void call(String number) => launch("tel:$number");
+// }
 
-GetIt locator = GetIt.asNewInstance();
-
-void set() {
-  locator.registerSingleton(CallService());
-}
+// GetIt locator = GetIt.asNewInstance();
+//
+// void set() {
+//   locator.registerSingleton(CallService());
+// }
 
 class Subject extends StatefulWidget {
-  Subject({required this.semester, required this.subjectCode});
+  Subject({required this.subjectCode});
 
-  final int semester;
+  // final int semester;
   final String subjectCode;
 
   @override
@@ -109,7 +109,7 @@ class _SubjectState extends State<Subject> with SingleTickerProviderStateMixin {
               StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Subjects')
-                    .doc('${widget.semester}_${widget.subjectCode}')
+                    .doc('${widget.subjectCode}')
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -207,7 +207,7 @@ class _SubjectState extends State<Subject> with SingleTickerProviderStateMixin {
               StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Subjects')
-                    .doc('${widget.semester}_${widget.subjectCode}')
+                    .doc('${widget.subjectCode}')
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -383,7 +383,7 @@ class StreamWidget extends StatelessWidget {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
           .collection('Subjects')
-          .doc('${widget.semester}_${widget.subjectCode}')
+          .doc('${widget.subjectCode}')
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -440,18 +440,18 @@ class StreamWidget extends StatelessWidget {
                       AssetImage('assets/svgIcons/preview.png'),
                     ),
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PDFViewer(
-                            url: element['Content URL'] ?? '',
-                            sem: widget.semester,
-                            subjectCode: widget.subjectCode,
-                            typeKey: typeKey,
-                            uniqueID: int.parse(element['id'].toString()),
-                            title: element['Title'] ?? '',
-                          ),
-                        ),
-                      );
+                      // Navigator.of(context).push(
+                      //   MaterialPageRoute(
+                      //     builder: (context) => PDFViewer(
+                      //       url: element['Content URL'] ?? '',
+                      //       sem: widget.semester,
+                      //       subjectCode: widget.subjectCode,
+                      //       typeKey: typeKey,
+                      //       uniqueID: int.parse(element['id'].toString()),
+                      //       title: element['Title'] ?? '',
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                   trailing: IconButton(
@@ -460,36 +460,36 @@ class StreamWidget extends StatelessWidget {
                       size: 20,
                     ),
                     onPressed: () async {
-                      try {
-                        String url = element['Content URL'] ?? '';
-                        String dir = (await getApplicationDocumentsDirectory()).path;
-                        String path = "$dir/${widget.semester}_${widget.subjectCode}_${typeKey[0]}_${element['id']}_${element['Title']}";
-                        if (await File(path).exists()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('File Already Downloaded'),
-                            ),
-                          );
-                        } else {
-                          var request = await HttpClient().getUrl(Uri.parse(url));
-                          var response = await request.close();
-                          var bytes = await consolidateHttpClientResponseBytes(response);
-                          File file = File(path);
-                          await file.writeAsBytes(bytes);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Download Complete'),
-                            ),
-                          );
-                        }
-                      } catch (err) {
-                        print('Error downloading file: $err');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error downloading file'),
-                          ),
-                        );
-                      }
+                      // try {
+                      //   String url = element['Content URL'] ?? '';
+                      //   String dir = (await getApplicationDocumentsDirectory()).path;
+                      //   String path = "$dir/${widget.semester}_${widget.subjectCode}_${typeKey[0]}_${element['id']}_${element['Title']}";
+                      //   if (await File(path).exists()) {
+                      //     ScaffoldMessenger.of(context).showSnackBar(
+                      //       SnackBar(
+                      //         content: Text('File Already Downloaded'),
+                      //       ),
+                      //     );
+                      //   } else {
+                      //     var request = await HttpClient().getUrl(Uri.parse(url));
+                      //     var response = await request.close();
+                      //     var bytes = await consolidateHttpClientResponseBytes(response);
+                      //     File file = File(path);
+                      //     await file.writeAsBytes(bytes);
+                      //     ScaffoldMessenger.of(context).showSnackBar(
+                      //       SnackBar(
+                      //         content: Text('Download Complete'),
+                      //       ),
+                      //     );
+                      //   }
+                      // } catch (err) {
+                      //   print('Error downloading file: $err');
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text('Error downloading file'),
+                      //     ),
+                      //   );
+                      //}
                     },
                   ),
                 ),
