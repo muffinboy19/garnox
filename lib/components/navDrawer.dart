@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:untitled1/components/navdrawerItem.dart';
 import 'package:untitled1/models/user.dart';
 import 'package:untitled1/pages/home.dart';
-import 'package:untitled1/pages/userdetailgetter.dart';
+import 'package:untitled1/pages/SemisterAskingPage.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
 import 'package:untitled1/utils/signinutil.dart';
 import 'package:untitled1/utils/contstants.dart';

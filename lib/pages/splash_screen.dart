@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Import for SVG support
 import 'package:untitled1/pages/home.dart';
-import 'package:untitled1/pages/userdetailgetter.dart';
+import 'package:untitled1/pages/SemisterAskingPage.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
 
@@ -33,15 +33,9 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isLoggedIn = await SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN);
     // Navigate to the appropriate screen based on login status
     if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Home()),
-      );
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Home()),
-      );
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 

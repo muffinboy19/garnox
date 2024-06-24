@@ -9,7 +9,7 @@ import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/pages/pdf.dart';
 import 'package:untitled1/pages/signin.dart';
 import 'package:untitled1/pages/splash_screen.dart';
-import 'package:untitled1/pages/userdetailgetter.dart';
+import 'package:untitled1/pages/SemisterAskingPage.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
 import 'package:untitled1/pages/subject.dart';
@@ -32,17 +32,15 @@ Future<void> main() async {
 
     // Introduce a delay before calling set()
     // await Future.delayed(Duration(milliseconds: 500)); // Adjust delay as needed
-    set();
-
+    set(); // Assuming 'set()' is defined elsewhere
   } catch (e) {
-    print('Error initializing Firebase: $e');
+    print('Error initializing Firebase:$e');
   }
   runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
   @override
-
   _MyAppState createState() => _MyAppState();
 }
 
@@ -70,7 +68,8 @@ class _MyAppState extends State<MyApp> {
         ),
         tabBarTheme: TabBarTheme(
           labelColor: Constants.WHITE,
-          labelStyle: TextStyle(fontWeight: FontWeight.w600, color: Constants.WHITE),
+          labelStyle:
+              TextStyle(fontWeight: FontWeight.w600, color: Constants.WHITE),
           unselectedLabelColor: Constants.SKYBLUE,
           unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
         ),
@@ -86,11 +85,23 @@ class _MyAppState extends State<MyApp> {
       ),
       title: 'SemBreaker',
       debugShowCheckedModeBanner: false,
+      // Define your routes here (remove the '/' entry since you have 'home')
+      routes: {
+        '/home': (context) => Home(), // Route for your home screen
+        //'/signin': (context) => SignIn(),
+        //'/about': (context) => AboutUs(),
+        //'///admin': (context) => Admin(),
+        //'/announcements': (context) => Announcements(),
+        '/downloads': (context) => Downloads(),
+        // '/pdf': (context) => PDFScreen(),
+        '/semisterAskingPage': (context) => SemsiterAskingPage(),
+        //'/subject': (context) => Subject(), // You might need to adjust this based onhow you pass data to Subject
+      },
       home: FutureBuilder(
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? Test(): Home();
+            return snapshot.data! ? Home() : Home();
           } else {
             return Blank();
           }
