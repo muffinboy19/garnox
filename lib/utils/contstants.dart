@@ -15,6 +15,7 @@ class Constants {
   static const Color DARK_SKYBLUE = Color(0xff00BCD4); // theme color
   static const Color BLACK = Color(0xff000000); // subjectcode color
   static const Color WHITE = Color(0xffFFFFFF);
+  static const Color APPCOLOUR = Color(0xff407BFF);
 
   static const kTextFieldDecoration = InputDecoration(
     filled: true,

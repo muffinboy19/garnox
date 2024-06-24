@@ -1,8 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled1/pages/about.dart';
+import 'package:untitled1/pages/admin.dart';
+import 'package:untitled1/pages/announcements.dart';
 import 'package:untitled1/pages/blank.dart';
+import 'package:untitled1/pages/downloads.dart';
 import 'package:untitled1/pages/home.dart';
-import 'package:untitled1/pages/landingPage.dart';
+import 'package:untitled1/pages/pdf.dart';
+import 'package:untitled1/pages/signin.dart';
+import 'package:untitled1/pages/splash_screen.dart';
 import 'package:untitled1/pages/userdetailgetter.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
@@ -25,18 +31,13 @@ Future<void> main() async {
     print('Firebase initialized successfully');
 
     // Introduce a delay before calling set()
-    await Future.delayed(Duration(milliseconds: 500)); // Adjust delay as needed
+    // await Future.delayed(Duration(milliseconds: 500)); // Adjust delay as needed
     set();
 
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
-  runApp(SafeArea(
-      child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home : Landingpage()
-      )
-  ));
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -65,7 +66,7 @@ class _MyAppState extends State<MyApp> {
         primaryIconTheme: IconThemeData(color: Colors.white),
         indicatorColor: Constants.WHITE,
         primaryTextTheme: TextTheme(
-          headlineMedium: TextStyle(color: Colors.white),
+          headline6: TextStyle(color: Colors.white),
         ),
         tabBarTheme: TabBarTheme(
           labelColor: Constants.WHITE,
@@ -89,7 +90,7 @@ class _MyAppState extends State<MyApp> {
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? Home() : UserDetailGetter();
+            return snapshot.data! ? Test(): Home();
           } else {
             return Blank();
           }

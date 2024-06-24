@@ -3,16 +3,16 @@ import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/utils/signinutil.dart';
 
 class SignIn extends StatelessWidget {
-  final String college;
-  final int batch;
-  final String branch;
-  final int semester;
+  final String? college;
+  final int? batch;
+  final String? branch;
+  final int? semester;
 
   SignIn({
-    required this.college,
-    required this.batch,
-    required this.branch,
-    required this.semester,
+     this.college,
+     this.batch,
+     this.branch,
+     this.semester,
   });
 
   @override
@@ -86,10 +86,10 @@ class SignIn extends StatelessWidget {
 
   void signInWithGoogle(BuildContext context) {
     SignInUtil(
-      college: college,
-      semester: semester,
-      batch: batch,
-      branch: branch,
+      college: college!,
+      semester: semester!,
+      batch: batch!,
+      branch: branch!,
     ).signInWithGoogle().then((_) {
       // Navigate to home screen after sign-in is complete
       Navigator.pushReplacement(

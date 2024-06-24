@@ -221,7 +221,7 @@ class _NavDrawerState extends State<NavDrawer> {
       await SignInUtil().signOutGoogle(); // Assuming this signs out the user
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (BuildContext context) => UserDetailGetter()),
+        MaterialPageRoute(builder: (BuildContext context) => Home()),
         ModalRoute.withName('/'),
       );
     }

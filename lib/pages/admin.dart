@@ -3,6 +3,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/custom_loader.dart';
 import 'package:untitled1/pages/subjects_admin.dart';
 
+
+/*
+
+
+developer NOTES :
+
+
+This page is only accessible by a admin user id
+
+
+
+CURRENTLY WE DONT HAVE TO WORK ON THIS FILE
+
+
+
+
+
+ */
+
 class Admin extends StatefulWidget {
   final String uid;
 
