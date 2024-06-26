@@ -132,7 +132,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       TextButton(
                         // Using TextButton instead of FlatButton
                         onPressed: () {
-                          print("[subjectCodeOnly]   Subject Code Tapped: $key");
+                          print("[asd]   Subject Code Tapped: $key");
+                          Navigator.push(context,
+                            MaterialPageRoute(
+                              builder: (context) => Subject(
+                                subjectCode: key,
+                              ),
+                            ),
+                          );
+                          print("[asd]   subject");
+
+
                         },
                         child: ListTile(
                           leading: Image.asset(

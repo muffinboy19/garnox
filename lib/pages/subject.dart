@@ -1,34 +1,16 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:untitled1/components/custom_loader.dart';
 import 'package:untitled1/components/error_animatedtext.dart';
 import 'package:untitled1/components/nocontent_animatedtext.dart';
-import 'package:untitled1/pages/pdf.dart';
 import 'package:untitled1/utils/unicorndial_edited.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:get_it/get_it.dart';
 import '../utils/contstants.dart';
-import 'package:get_it/get_it.dart';
-
-
-// class CallService {
-//   void call(String number) => launch("tel:$number");
-// }
-
-// GetIt locator = GetIt.asNewInstance();
-//
-// void set() {
-//   locator.registerSingleton(CallService());
-// }
 
 class Subject extends StatefulWidget {
   Subject({required this.subjectCode});
 
-  // final int semester;
   final String subjectCode;
 
   @override
@@ -37,232 +19,42 @@ class Subject extends StatefulWidget {
 
 class _SubjectState extends State<Subject> with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
-  late AnimationController _hideFabAnimController;
 
   @override
   void initState() {
     super.initState();
+    print("asd: ${widget.subjectCode}");
     _scrollController = ScrollController();
-    _hideFabAnimController = AnimationController(
-      vsync: this,
-      duration: kThemeAnimationDuration,
-      value: 1, // initially visible
-    );
 
-    _scrollController.addListener(
-      () {
-        switch (_scrollController.position.userScrollDirection) {
-          // Scrolling up - forward the animation (value goes to 1)
-          case ScrollDirection.forward:
-            _hideFabAnimController.forward();
-            break;
-          // Scrolling down - reverse the animation (value goes to 0)
-          case ScrollDirection.reverse:
-            _hideFabAnimController.reverse();
-            break;
-          // Idle - keep FAB visibility unchanged
-          case ScrollDirection.idle:
-            break;
-        }
-      },
-    );
+    _scrollController.addListener(() {
+      switch (_scrollController.position.userScrollDirection) {
+        case ScrollDirection.forward:
+          break;
+        case ScrollDirection.reverse:
+          break;
+        case ScrollDirection.idle:
+          break;
+      }
+    });
   }
 
   void handleClick(String value) {
+    if (value.isEmpty) {
+      print("the value here is empty [asd]");
+    } else {
+      print("the value is not empty [asd]");
+    }
     switch (value) {
       case 'Recommended Books':
-        recBooks(context);
         break;
       case 'Moderators':
-        modno(context);
         break;
     }
   }
 
-  void modno(BuildContext context) {
-    showModalBottomSheet(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
-      ),
-      context: context,
-      builder: (builder) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Constants.WHITE,
-            borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(24.0),
-              topRight: const Radius.circular(24.0),
-            ),
-          ),
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Ensure the column only takes minimum space needed
-            children: <Widget>[
-              Container(
-                height: 6,
-                width: 64,
-                color: Colors.black45,
-              ),
-              SizedBox(height: 12),
-              StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('Subjects')
-                    .doc('${widget.subjectCode}')
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-                  if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
-                    return Center(child: Text('No data available'));
-                  }
-
-                  List<Widget> messageWidgets = [];
-                  List<dynamic> mods = snapshot.data!.get('MODERATORS') ?? [];
-
-                  for (int i = 0; i < mods.length; i++) {
-                    final ctnum = mods[i]['Contact Number'];
-                    final name = mods[i]['Name'];
-                    messageWidgets.add(
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              name ?? '',
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              ctnum ?? '',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontFamily: 'Roboto',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                    // Add a divider between moderators
-                    if (i < mods.length - 1) {
-                      messageWidgets.add(Divider());
-                    }
-                  }
-
-                  return Flexible(
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      children: messageWidgets,
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-
-  void recBooks(BuildContext context) {
-    showModalBottomSheet(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
-      ),
-      context: context,
-      builder: (builder) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Constants.WHITE,
-            borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(24.0),
-              topRight: const Radius.circular(24.0),
-            ),
-          ),
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Ensure the column only takes minimum space needed
-            children: <Widget>[
-              Container(
-                height: 6,
-                width: 64,
-                color: Colors.black45,
-              ),
-              SizedBox(height: 12),
-              StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('Subjects')
-                    .doc('${widget.subjectCode}')
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-                  if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
-                    return Center(child: Text('No data available'));
-                  }
-
-                  List<Widget> messageWidgets = [];
-                  List<dynamic> recBooks = snapshot.data!.get('Recommended Books') ?? [];
-
-                  for (int i = 0; i < recBooks.length; i++) {
-                    final author = recBooks[i]['Author'];
-                    final bookTitle = recBooks[i]['BookTitle'];
-                    final publication = recBooks[i]['Publication'];
-
-                    /*
-                    only for now i have put all of these as true adn tehy out to bee changed
-                     */
-
-                    messageWidgets.add(ListItem(heading: bookTitle));
-                    messageWidgets.add(ListItem(heading: 'Author:', subheaading: author));
-                    messageWidgets.add(ListItem(heading: 'Publication:', subheaading: publication));
-
-                    // Add a divider between books
-                    if (i < recBooks.length - 1) {
-                      messageWidgets.add(Divider());
-                    }
-                  }
-
-                  return Flexible(
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      children: messageWidgets,
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-
   @override
   void dispose() {
     _scrollController.dispose();
-    _hideFabAnimController.dispose();
     super.dispose();
   }
 
@@ -316,64 +108,19 @@ class _SubjectState extends State<Subject> with SingleTickerProviderStateMixin {
             ),
           ],
         ),
-        floatingActionButton: FadeTransition(
-          opacity: _hideFabAnimController,
-          child: ScaleTransition(
-            scale: _hideFabAnimController,
-            child: UnicornDialer(
-              backgroundColor: Colors.white70,
-              parentButton: ImageIcon(AssetImage('assets/svgIcons/info.png')),
-              parentButtonBackground: Constants.DARK_SKYBLUE,
-              finalButtonIcon: Icon(Icons.close),
-              childPadding: 12,
-              childButtons: [
-                UnicornButton(
-                  labelColor: Colors.black,
-                  hasLabel: true,
-                  labelText: 'Books',
-                  currentButton: FloatingActionButton(
-                    heroTag: null,
-                    mini: true,
-                    onPressed: () {
-                      recBooks(context);
-                    },
-                    backgroundColor: Constants.DARK_SKYBLUE,
-                    child: ImageIcon(AssetImage('assets/svgIcons/book.png'),
-                        size: 20),
-                  ), labelBackgroundColor: Colors.white, labelShadowColor: null,
-                ),
-                UnicornButton(
-                  labelColor: Colors.black,
-                  hasLabel: true,
-                  labelText: 'Moderators',
-                  currentButton: FloatingActionButton(
-                    heroTag: null,
-                    mini: true,
-                    onPressed: () {
-                      modno(context);
-                    },
-                    backgroundColor: Constants.DARK_SKYBLUE,
-                    child: ImageIcon(
-                        AssetImage('assets/svgIcons/moderators.png'),
-                        size: 20),
-                  ),
-                ),
-              ], onMainButtonPressed: () {  },
-            ),
-          ),
-        ),
       ),
     );
   }
 }
 
 class StreamWidget extends StatelessWidget {
-  const StreamWidget(
-      {Key? key,
-      required this.widget,
-      required this.typeKey,
-      required this.scrollController})
-      : super(key: key);
+  const StreamWidget({
+    Key? key,
+    required this.widget,
+    required this.typeKey,
+    required this.scrollController,
+  }) : super(key: key);
+
   final ScrollController scrollController;
   final Subject widget;
   final String typeKey;
@@ -386,7 +133,10 @@ class StreamWidget extends StatelessWidget {
           .doc('${widget.subjectCode}')
           .snapshots(),
       builder: (context, snapshot) {
+        print("[nsd] ************************  ${widget.subjectCode}");
+
         if (snapshot.connectionState == ConnectionState.waiting) {
+          print("this means the connections is not yet made  [nsd] ");
           return CustomLoader(); // Display a loader while waiting for data
         }
 
@@ -395,14 +145,15 @@ class StreamWidget extends StatelessWidget {
           return Center(child: Text('Error fetching data'));
         }
 
-        if (!snapshot.hasData || !snapshot.data!.exists) {
+        if (!snapshot.hasData || snapshot.data == null || snapshot.data?.data() == null) {
           return NoContentAnimatedText(); // Display message when no data exists
         }
 
         try {
-          final data = snapshot.data!.data() as Map<String, dynamic>;
+          final data = snapshot.data?.data() as Map<String, dynamic>;
 
           List<Map<String, dynamic>> materialData = [];
+          print("$data         [nsd]  ");
 
           // Determine which typeKey to use based on your app logic
           if (typeKey == 'Material') {
@@ -415,6 +166,7 @@ class StreamWidget extends StatelessWidget {
 
           // Check if materialData is empty and display appropriate message
           if (materialData.isEmpty) {
+            print("no material is present  [asd] ");
             return NoContentAnimatedText();
           }
 
@@ -488,7 +240,6 @@ class StreamWidget extends StatelessWidget {
                       //     SnackBar(
                       //       content: Text('Error downloading file'),
                       //     ),
-                      //   );
                       //}
                     },
                   ),
@@ -497,7 +248,11 @@ class StreamWidget extends StatelessWidget {
             );
           }).toList();
 
-          listMaterials.add(SizedBox(height: 100));
+          // Ensure the SizedBox is wrapped in a Padding widget
+          listMaterials.add(Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(height: 100),
+          ));
 
           return Container(
             child: ListView(
@@ -506,13 +261,12 @@ class StreamWidget extends StatelessWidget {
             ),
           );
         } catch (err) {
-          print('Error building materials list: $err');
+          print('Error building materials list    [asd] : $err');
           return ErrorAnimatedText(key: null,); // Display an error message if building the list fails
         }
       },
     );
   }
-
 
   Future urlLauncher(url) async {
     {
@@ -525,15 +279,13 @@ class StreamWidget extends StatelessWidget {
   }
 }
 
-class ListItem extends StatelessWidget {
-  // final CallService _service = locator<CallService>();
 
+class ListItem extends StatelessWidget {
   @override
-  ListItem({required this.heading,  this.subheaading,  this.b,  this.c,  this.phone});
+  ListItem({required this.heading, this.subheaading, this.b, this.c, this.phone});
 
   String heading;
   String? subheaading;
-  // Icon head;
   bool? b = false;
   bool? c = false;
   bool? phone = false;
@@ -591,7 +343,7 @@ class ListItem extends StatelessWidget {
               Flexible(
                 flex: 4,
                 child: Text(
-                  subheaading!,
+                  subheaading ?? 'subheading',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -624,7 +376,7 @@ class ListItem extends StatelessWidget {
                 ),
                 Flexible(
                   child: Text(
-                    subheaading!,
+                    subheaading ?? 'subheading',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontFamily: 'Montserrat',
