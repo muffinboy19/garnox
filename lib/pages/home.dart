@@ -1,9 +1,8 @@
-import 'dart:convert';
-
-import 'package:circle_list/circle_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:untitled1/components/custom_loader.dart';
 import 'package:untitled1/components/error_animatedtext.dart';
 import 'package:untitled1/components/navDrawer.dart';
@@ -11,10 +10,8 @@ import 'package:untitled1/components/nocontent_animatedtext.dart';
 import 'package:untitled1/models/user.dart';
 import 'package:untitled1/pages/subject.dart';
 import 'package:untitled1/utils/contstants.dart';
-import 'package:untitled1/utils/sharedpreferencesutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../components/CustomFlatButton.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -24,7 +21,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   User userLoad = User();
   late ScrollController _scrollController;
-  late AnimationController _hideFabAnimController;
   bool admin = false;
   int? currentSemester;
   String? currentBranch;
@@ -39,39 +35,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     });
   }
 
-  Future checkIfAdmin() async {
-    final QuerySnapshot result =
-        await FirebaseFirestore.instance.collection('admins').get();
-    final List<DocumentSnapshot> documents = result.docs;
-    documents.forEach((data) {
-      if (data.id == userLoad.uid) {
-        setState(() {
-          admin = true;
-        });
-      }
-    });
-  }
-
   @override
   void initState() {
-    print("[SharePref]  hellow owrld ");
     super.initState();
     fetchUserDetailsFromSharedPref();
-    print("[SharePref] ^^^^^^^^^^^^^^^^^^^");
-    checkIfAdmin();
     _scrollController = ScrollController();
-    _hideFabAnimController = AnimationController(
-      vsync: this,
-      duration: kThemeAnimationDuration,
-      value: 1, // initially visible
-    );
     _scrollController.addListener(() {
       switch (_scrollController.position.userScrollDirection) {
         case ScrollDirection.forward:
-          _hideFabAnimController.forward();
           break;
         case ScrollDirection.reverse:
-          _hideFabAnimController.reverse();
           break;
         case ScrollDirection.idle:
           break;
@@ -82,136 +55,167 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _scrollController.dispose();
-    _hideFabAnimController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       drawer: NavDrawer(userData: userLoad, admin: admin),
       appBar: AppBar(
-        backgroundColor: Constants.DARK_SKYBLUE,
+        backgroundColor: Colors.white,
         elevation: 0,
-        bottom: PreferredSize(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 12, left: 16),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Semester ${currentSemester ?? ''}",
-                style: TextStyle(
-                  fontSize: 24,
-                  color: Constants.WHITE,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+        title: Text(
+          'Home',
+          style: GoogleFonts.epilogue(
+            textStyle: TextStyle(
+              color: Constants.BLACK,
+              fontWeight: FontWeight.bold,),
           ),
-          preferredSize: Size.fromHeight(28),
         ),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            "assets/svgIcons/hamburger.svg",
+            color:Constants.BLACK,
+          ),
+          onPressed: () {
+            // Handle drawer opening
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              "assets/svgIcons/notification.svg",
+              color:Constants.BLACK,
+            ),
+            onPressed: () {
+              // Handle notification action
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 20),
-        child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection('Semesters')
-              .doc('${currentSemester}')
-              .snapshots(),
-          builder: (context, snapshot) {
-            try {
-              if (snapshot.hasData && snapshot.data!.exists) {
-                Map<String, dynamic> branchSubjects =
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding( // Added search bar
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search subjects...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                onChanged: (text) {
+                  // Implement search logic here
+                },
+              ),
+            ),
+            SizedBox(height: 16), // Space between search bar and heading
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "Subjects",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Expanded( // To allow horizontal scrolling
+              child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('Semesters')
+                    .doc('${currentSemester}')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  try {
+                    if (snapshot.hasData && snapshot.data!.exists) {Map<String, dynamic> branchSubjects =
                     (snapshot.data!.data() as Map<String, dynamic>)['branches']
-                            ['${currentBranch?.toUpperCase()}']
-                        as Map<String, dynamic>;
-                List<Widget> subjects = [];
-                branchSubjects.forEach(
-                  (key, value) {
-                    subjects.add(
-                      TextButton(
-                        // Using TextButton instead of FlatButton
-                        onPressed: () {
-                          print("[asd]   Subject Code Tapped: $key");
-                          Navigator.push(context,
-                            MaterialPageRoute(
-                              builder: (context) => Subject(
-                                subjectCode: key,
-                              ),
-                            ),
-                          );
-                          print("[asd]   subject");
+                    ['${currentBranch?.toUpperCase()}']
+                    as Map<String, dynamic>;
+                    return ListView.separated(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal, // Horizontal scrolling
+                      itemCount: branchSubjects.length,
+                      separatorBuilder: (context, index) => SizedBox(width: 16),
+                      itemBuilder: (context, index) {
+                        String key = branchSubjects.keys.elementAt(index);
+                        String value = branchSubjects[key];
+                        return SubjectCard(subjectCode: key, subjectName: value);
+                      },
 
-
-                        },
-                        child: ListTile(
-                          leading: Image.asset(
-                            'assets/images/Computer.png',
-                            height: 32,
-                          ),
-                          title: Text(
-                            key, // Or display 'value' if you want the subject name
-                            style: TextStyle(
-                              color: Constants.BLACK,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          subtitle: Text(
-                            value,
-                            style: TextStyle(
-                              color: Constants.STEEL,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          trailing: Icon(
-                            Icons.keyboard_arrow_right,
-                            color: Constants.BLACK,
-                            size: 36,
-                          ),
-                        ),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Constants.BLACK,
-                          backgroundColor: Colors.transparent,
-                          // ... other style properties ...
-                        ),
-                      ),
                     );
-                  },
-                );
-                if (subjects.isEmpty) {
-                  return NoContentAnimatedText();
-                }
-                subjects.add(
-                  SizedBox(
-                    height: 100,
-                  ),
-                );
-
-                return Container(
-                  child: ListView.separated(
-                    controller: _scrollController,
-                    itemCount: subjects.length,
-                    separatorBuilder: (BuildContext context, int index) =>
-                        Divider(
-                      thickness: 0.5,
-                      color: Constants.SMOKE,
-                      indent: 24,
-                      endIndent: 24,
-                    ),
-                    itemBuilder: (BuildContext context, int index) {
-                      return subjects[index];
-                    },
-                  ),
-                );
-              }
-            } catch (err) {
-              return ErrorAnimatedText(key: null,);
-            }
-            return CustomLoader();
-          },
+                    }
+                  } catch (err) {
+                    return ErrorAnimatedText(key: null);
+                  }
+                  return CustomLoader();
+                },
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+
+
+
+class SubjectCard extends StatelessWidget {
+  final String subjectCode;
+  final String subjectName;
+
+  const SubjectCard({required this.subjectCode, required this.subjectName});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        print("[asd]   SubjectCode Tapped: $subjectCode");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Subject(
+              subjectCode: subjectCode,
+            ),
+          ),
+        );
+      },
+      child: Column(
+        children: [Container(
+          width: 150,
+          height: 100, // Reduced height of the box
+          margin: EdgeInsets.symmetric(horizontal: 0),
+          child: Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            color: Color(0xFFE8E5EF),
+            child: Center(
+              child: SvgPicture.asset(
+                "assets/svgIcons/file.svg", // Replace with your actual SVG path
+                width: 30, // Adjust size as needed
+                height: 30,
+                color: Constants.APPCOLOUR,
+              ),
+            ),),
+        ),
+          SizedBox(height: 8),
+          Text(
+            subjectCode,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),), // Display subject name
+        ],
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:untitled1/pages/pdf.dart';
 import 'package:untitled1/pages/signin.dart';
 import 'package:untitled1/pages/splash_screen.dart';
 import 'package:untitled1/pages/SemisterAskingPage.dart';
+import 'package:untitled1/utils/Functions.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
 import 'package:untitled1/pages/subject.dart';
@@ -64,7 +65,7 @@ class _MyAppState extends State<MyApp> {
         primaryIconTheme: IconThemeData(color: Colors.white),
         indicatorColor: Constants.WHITE,
         primaryTextTheme: TextTheme(
-          headline6: TextStyle(color: Colors.white),
+          headlineMedium: TextStyle(color: Colors.white),
         ),
         tabBarTheme: TabBarTheme(
           labelColor: Constants.WHITE,
@@ -101,7 +102,7 @@ class _MyAppState extends State<MyApp> {
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? SemsiterAskingPage() : Home();
+            return snapshot.data! ? Home() : Home();
           } else {
             return Blank();
           }
