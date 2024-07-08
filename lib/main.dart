@@ -6,6 +6,7 @@ import 'package:untitled1/pages/announcements.dart';
 import 'package:untitled1/pages/blank.dart';
 import 'package:untitled1/pages/downloads.dart';
 import 'package:untitled1/pages/home.dart';
+import 'package:untitled1/pages/landingPage.dart';
 import 'package:untitled1/pages/pdf.dart';
 import 'package:untitled1/pages/signin.dart';
 import 'package:untitled1/pages/splash_screen.dart';
@@ -102,7 +103,7 @@ class _MyAppState extends State<MyApp> {
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? Home() : Home();
+            return snapshot.data! ? Landingpage() : Landingpage();
           } else {
             return Blank();
           }
