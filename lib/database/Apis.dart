@@ -1,20 +1,54 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:untitled1/models/SpecificSubjectModel.dart';
 import 'package:untitled1/models/chatuser.dart';
+import 'package:untitled1/pages/sem_vise_subjects.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:untitled1/pages/subject.dart';
 
 class APIs {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static User get user=> auth.currentUser!;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  
+//--------------FETCH ALL SUBJECTS DATA AND STORE IT INTO LOCAL STORAGE--------------------------------------------//
+  static Future<void> fetchAllSubjects() async {
+    final storage = new FlutterSecureStorage();
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('Subjects')
+          .get();
 
+      querySnapshot.docs.forEach((doc) async {
+        try {
+          var jsonData = doc.data();
+          var subject = SpecificSubject.fromJson(jsonData);
+          var encodedSubject = jsonEncode(subject.toJson());
+
+          await storage.write(key: subject.subjectCode, value: encodedSubject);
+          // log("${subject.subjectCode} : ${encodedSubject}");
+        } catch (e) {
+          print('Error writing to secure storage: $e');
+        }}
+      );
+
+
+    }catch(e){
+      log("fetchAllSubjects Error: $e");
+    }
+  }
+
+//-----------------------------check user exists-----------------------------------//
   static Future<bool> userExists() async {
     return (await firestore.collection('users').doc(user.uid).get()).exists;
   }
 
 
+//-----------------------------create user through google-----------------------------------//
   static Future<void> createGoogleUser() async {
     final chatUser = ChatUser(
         uid: user.uid,
@@ -28,6 +62,8 @@ class APIs {
         .set(chatUser.toJson());
   }
 
+
+//-----------------------------check user-----------------------------------//
   static Future<void> createUser(String collName, String id, String email, String name) async {
     try {
       await FirebaseFirestore.instance.collection(collName).doc(id).set({
@@ -40,6 +76,8 @@ class APIs {
     }
   }
 
+
+//-----------------------------Signup-----------------------------------//
   static Future<void> signup(String email, String password, String firstname, String lastname) async {
     try {
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(email: email, password: password);
@@ -64,6 +102,8 @@ class APIs {
     }
   }
 
+
+//-----------------------------Sign IN-----------------------------------//
   static Future<void> signin(String email, String password) async {
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
@@ -80,6 +120,8 @@ class APIs {
     }
   }
 
+
+//-----------------------------Google Sign IN-----------------------------------//
   static Future<UserCredential?> googleSignIn()async{
     try{
       await InternetAddress.lookup('google.com');
@@ -99,4 +141,26 @@ class APIs {
       return null;
     }
   }
+
+
+//-----------------------------Fetch All Semister wise subjects-----------------------------------//
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> semViseSubjects() {
+    try {
+      final stream = APIs.firestore.collection('Data')
+          .where('yearName', isEqualTo: "2026")
+          .snapshots();
+      stream.listen((snapshot) {
+        for (var doc in snapshot.docs) {
+          log("Document data: ${jsonEncode(doc.data())}");
+        }
+      });
+      return stream;
+    } catch (e) {
+      log("Error getting document stream: $e");
+      // Return an empty stream in case of an error
+      return const Stream.empty();
+    }
+  }
+  
 }

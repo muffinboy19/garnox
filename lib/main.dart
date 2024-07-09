@@ -8,6 +8,7 @@ import 'package:untitled1/pages/downloads.dart';
 import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/pages/landingPage.dart';
 import 'package:untitled1/pages/pdf.dart';
+import 'package:untitled1/pages/sem_vise_subjects.dart';
 import 'package:untitled1/pages/signin.dart';
 import 'package:untitled1/pages/splash_screen.dart';
 import 'package:untitled1/pages/SemisterAskingPage.dart';
@@ -103,7 +104,7 @@ class _MyAppState extends State<MyApp> {
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? Landingpage() : Landingpage();
+            return snapshot.data! ? SemViseSubjects() : SemViseSubjects();
           } else {
             return Blank();
           }
