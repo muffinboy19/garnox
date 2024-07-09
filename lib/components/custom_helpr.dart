@@ -7,4 +7,15 @@ class Dialogs{
         backgroundColor: Colors.blue.withOpacity(.8),
         behavior: SnackBarBehavior.floating));
   }
+
+  static void showProgressBar(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) => const Center(
+            child: CircularProgressIndicator(
+              color: Colors.blueAccent,
+              strokeWidth: 1,
+            )));
+  }
+
 }

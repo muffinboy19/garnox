@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:untitled1/database/Apis.dart';
+import 'package:untitled1/database/Locals.dart';
 import 'package:untitled1/models/SpecificSubjectModel.dart';
 import 'package:untitled1/utils/contstants.dart';
 
@@ -129,11 +131,11 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
   Widget _buildTabContent(String type) {
     List<Widget> items = [];
     if (type == "material") {
-      items = widget.subject.material.map((item) => _subCard(item.title, "material")).toList();
+      items = widget.subject.material.map((item) => _subCard(item.title, item.contentURL)).toList();
     } else if (type == "papers") {
-      items = widget.subject.questionPapers.map((item) => _subCard(item.title, "questionPapers")).toList();
+      items = widget.subject.questionPapers.map((item) => _subCard(item.title, item.url)).toList();
     } else if (type == "links") {
-      items = widget.subject.importantLinks.map((item) => _subCard(item.title, "importantLinks")).toList();
+      items = widget.subject.importantLinks.map((item) => _subCard(item.title, item.contentURL)).toList();
     } else {
       return Center(child: Text("No Data Found"));
     }
@@ -145,12 +147,12 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
   }
 
   Widget _subCard(String title, String type) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: InkWell(
-        onTap: () async {
-          // Handle tap action
-        },
+    return InkWell(
+      onTap: () async{
+          LOCALs.recents(title, type);
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: Card(
           elevation: 1,
           child: ListTile(

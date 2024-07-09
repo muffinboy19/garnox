@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:untitled1/components/custom_snackbar.dart';
+import 'package:untitled1/components/custom_helpr.dart';
 import 'package:untitled1/database/Apis.dart';
 import 'package:untitled1/pages/Subject_detail.dart';
 import 'package:untitled1/pages/subjects_admin.dart';
@@ -164,7 +164,6 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
                          }
                        }
                     },
-
                   )
                 ),
               ],
@@ -244,4 +243,5 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
       );
 
   }
+
 }
