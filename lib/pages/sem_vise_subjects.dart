@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -5,8 +7,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:untitled1/components/custom_snackbar.dart';
 import 'package:untitled1/database/Apis.dart';
+import 'package:untitled1/pages/Subject_detail.dart';
+import 'package:untitled1/pages/subjects_admin.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/models/SemViseSubModel.dart';
+
+import '../models/SpecificSubjectModel.dart';
 
 class SemViseSubjects extends StatefulWidget {
   const SemViseSubjects({super.key});
@@ -194,7 +200,19 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
       InkWell(
         onTap: () async{
           var temp = await storage.read(key: "$department");
-          Dialogs.showSnackbar(context, "$temp");
+          if (temp != null) {
+            Map<String, dynamic> tempJson = json.decode(temp);
+            SpecificSubject specificSubject = SpecificSubject.fromJson(tempJson);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SubjectDetail(subject: specificSubject),
+              ),
+            );
+          } else {
+            Dialogs.showSnackbar(context, "No data found");
+          }
         },
 
         child: Card(
@@ -206,6 +224,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
               ),
               onPressed: () {
                 // Handle drawer opening
+
               },
             ),
             title: Text(department ,style: GoogleFonts.epilogue(
