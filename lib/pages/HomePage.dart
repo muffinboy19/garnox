@@ -34,252 +34,264 @@ class _HomePageState extends State<HomePage> {
   final List<SemViseSubjects> _searchList = [];
   final storage = FlutterSecureStorage();
   List<Recents> _list = [];
+  late GlobalKey<RefreshIndicatorState> refreshKey;
 
   @override
   void initState() {
     super.initState();
+    refreshKey = GlobalKey<RefreshIndicatorState>();
   }
 
   Future<void> _initializeData() async {
-    await APIs.myInfo();
+    await APIs.offlineInfo();
+  }
+
+  Future<void> _handleRefresh() async {
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initializeData(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child: CircularProgressIndicator(
-                color: Colors.blue,
-              ),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child: Text("Error: ${snapshot.error}"),
-            ),
-          );
-        } else {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            appBar: AppBar(
+    return RefreshIndicator(
+      key: refreshKey,
+      onRefresh: _handleRefresh,
+
+      child: FutureBuilder(
+        future: _initializeData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
               backgroundColor: Colors.white,
-              elevation: 0,
-              title: Text(
-                'HomePage',
-                style: GoogleFonts.epilogue(
-                  textStyle: TextStyle(
-                    color: Constants.BLACK,
-                    fontWeight: FontWeight.bold,
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.blue,
+                ),
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                child: Text("Error: ${snapshot.error}"),
+              ),
+            );
+          } else {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                title: Text(
+                  'HomePage',
+                  style: GoogleFonts.epilogue(
+                    textStyle: TextStyle(
+                      color: Constants.BLACK,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              leading: IconButton(
-                icon: SvgPicture.asset(
-                  "assets/svgIcons/hamburger.svg",
-                  color: Constants.BLACK,
-                ),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-              ),
-              actions: [
-                IconButton(
+                leading: IconButton(
                   icon: SvgPicture.asset(
-                    "assets/svgIcons/notification.svg",
+                    "assets/svgIcons/hamburger.svg",
                     color: Constants.BLACK,
                   ),
                   onPressed: () {
-
+                    Scaffold.of(context).openDrawer();
                   },
                 ),
-              ],
-            ),
-            drawer: CustomNavDrawer(),
-            body: GestureDetector(
-              onTap: () => Focus.of(context).unfocus(),
-              child: WillPopScope(
-                onWillPop: () {
-                  if (_isSearching) {
-                    setState(() {
-                      _isSearching = !_isSearching;
-                    });
-                    return Future.value(false);
-                  } else {
-                    return Future.value(true);
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search subjects...',
-                            prefixIcon: Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          onChanged: (text) {
-                            setState(() {
-                              _isSearching = text.isNotEmpty;
-                            });
-                            // Implement search logic here
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "Subjects",
-                        style: GoogleFonts.epilogue(
-                          textStyle: TextStyle(
-                            color: Constants.BLACK,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          fontSize: 25,
-                        ),
-                      ),
-                      Container(
-                        height: 250,
-                        child: StreamBuilder(
-                          stream: APIs.semViseSubjects(),
-                          builder: (context, snapshots) {
-                            switch (snapshots.connectionState) {
-                              case ConnectionState.waiting:
-                              case ConnectionState.none:
-                                return const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.blue,
-                                  ),
-                                );
-                              case ConnectionState.active:
-                              case ConnectionState.done:
-                                if (snapshots.hasData) {
-                                  final data = snapshots.data?.docs;
-                                  final _list = data?.map((e) => SemViseSubject.fromJson(e.data())).toList() ?? [];
+                actions: [
+                  IconButton(
+                    icon: SvgPicture.asset(
+                      "assets/svgIcons/notification.svg",
+                      color: Constants.BLACK,
+                    ),
+                    onPressed: () {
 
-                                  if (_list.isEmpty) {
-                                    return Center(
-                                      child: Text(
-                                        'No Data Found',
-                                        style: GoogleFonts.epilogue(
-                                          textStyle: TextStyle(
-                                            color: Constants.BLACK,
-                                            fontWeight: FontWeight.bold,
+                    },
+                  ),
+                ],
+              ),
+              drawer: CustomNavDrawer(),
+              body: GestureDetector(
+                onTap: () => Focus.of(context).unfocus(),
+                child: WillPopScope(
+                  onWillPop: () {
+                    if (_isSearching) {
+                      setState(() {
+                        _isSearching = !_isSearching;
+                      });
+                      return Future.value(false);
+                    } else {
+                      return Future.value(true);
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Search subjects...',
+                              prefixIcon: Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onChanged: (text) {
+                              setState(() {
+                                _isSearching = text.isNotEmpty;
+                              });
+                              // Implement search logic here
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          "Subjects",
+                          style: GoogleFonts.epilogue(
+                            textStyle: TextStyle(
+                              color: Constants.BLACK,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            fontSize: 25,
+                          ),
+                        ),
+                        Container(
+                          height: 250,
+                          child: StreamBuilder(
+                            stream: APIs.semViseSubjects(),
+                            builder: (context, snapshots) {
+                              switch (snapshots.connectionState) {
+                                case ConnectionState.waiting:
+                                case ConnectionState.none:
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.blue,
+                                    ),
+                                  );
+                                case ConnectionState.active:
+                                case ConnectionState.done:
+                                  if (snapshots.hasData) {
+                                    final data = snapshots.data?.docs;
+                                    final _list = data?.map((e) => SemViseSubject.fromJson(e.data())).toList() ?? [];
+
+                                    if (_list.isEmpty) {
+                                      return Center(
+                                        child: Text(
+                                          'No Data Found',
+                                          style: GoogleFonts.epilogue(
+                                            textStyle: TextStyle(
+                                              color: Constants.BLACK,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    } else {
+                                      return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: _isSearching ? _searchList.length : _list.length,
+                                        itemBuilder: (context, index) {
+                                          return _subCardList(_list[index].ece ?? []);
+                                        },
+                                      );
+                                    }
                                   } else {
-                                    return ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: _isSearching ? _searchList.length : _list.length,
-                                      itemBuilder: (context, index) {
-                                        return _subCardList(_list[index].ece ?? []);
-                                      },
-                                    );
+                                    return Center(child: Text("Server is down"));
                                   }
-                                } else {
-                                  return Center(child: Text("Server is down"));
-                                }
-                            }
-                          },
-                        ),
-                      ),
-                      Text(
-                        "My Files",
-                        style: GoogleFonts.epilogue(
-                          textStyle: TextStyle(
-                            color: Constants.BLACK,
-                            fontWeight: FontWeight.bold,
+                              }
+                            },
                           ),
-                          fontSize: 25,
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black), // Add black border
-                                borderRadius: BorderRadius.all(Radius.circular(50)),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.all(Radius.circular(50)),
-                                child: Container(
-                                  height: 25,
-                                  width: 120,
-                                  child: Center(
-                                    child: Text(
-                                      "Recently used ￬",
-                                      style: TextStyle(fontWeight: FontWeight.w500),
+                        Text(
+                          "My Files",
+                          style: GoogleFonts.epilogue(
+                            textStyle: TextStyle(
+                              color: Constants.BLACK,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            fontSize: 25,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black), // Add black border
+                                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  child: Container(
+                                    height: 25,
+                                    width: 120,
+                                    child: Center(
+                                      child: Text(
+                                        "Recently used ￬",
+                                        style: TextStyle(fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (_) => RecentsPage()));
-                              },
-                              child: Text(
-                                "See all",
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      FutureBuilder(
-                        future: LOCALs.fetchRecents(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text("Error: ${snapshot.error}"),
-                            );
-                          } else if (snapshot.hasData) {
-                            _list = snapshot.data!;
-                            return Expanded(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: Column(
-                                  children: _list.map((subName) {
-                                    return _fileCard(subName);
-                                  }).toList(),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) => RecentsPage()));
+                                },
+                                child: Text(
+                                  "See all",
+                                  style: TextStyle(color: Colors.blue),
                                 ),
                               ),
-                            );
-                          } else {
-                            return Center(
-                              child: Text("No Files Found"),
-                            );
-                          }
-                        },
-                      ),
-                    ],
+                            ],
+                          ),
+                        ),
+                        FutureBuilder(
+                          future: LOCALs.fetchRecents(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text("Error: ${snapshot.error}"),
+                              );
+                            } else if (snapshot.hasData) {
+                              _list = snapshot.data!;
+                              return Expanded(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Column(
+                                    children: _list.map((subName) {
+                                      return _fileCard(subName);
+                                    }).toList(),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Center(
+                                child: Text("No Files Found"),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }
-      },
+            );
+          }
+        },
+      ),
     );
   }
 

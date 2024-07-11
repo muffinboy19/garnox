@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:untitled1/pages/ProfilePage.dart';
 import 'package:untitled1/pages/sem_vise_subjects.dart';
+import 'package:untitled1/pages/signIn.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import '../database/Apis.dart';
@@ -77,6 +78,7 @@ class _CustomNavDrawerState extends State<CustomNavDrawer> {
             _list(Icons.local_offer_outlined, "Offers", (){}),
             _list(Icons.share, "Share", (){}),
             _list(Icons.support_agent_outlined, "Support", (){}),
+            _list(Icons.logout_outlined, "Sign out", ()async{ await APIs.Signout(); Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>Signin()), (route) => false,);}),
             Spacer(),
             Divider(),
             _list(Icons.question_mark_sharp, "Colour Scheme", (){}),

@@ -107,7 +107,7 @@ class _MyAppState extends State<MyApp> {
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? Landingpage() : Landingpage()
+            return snapshot.data! ? SplashScreen() : SplashScreen()
             ;
           } else {
             return Blank();

@@ -1,8 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Import for SVG support
+import 'package:google_fonts/google_fonts.dart';
+import 'package:untitled1/pages/HomePage.dart';
 import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/pages/SemisterAskingPage.dart';
+import 'package:untitled1/pages/landingPage.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
 
@@ -25,17 +31,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Navigate after 4 seconds
     Future.delayed(Duration(seconds: 4), () {
-      _navigateToNextScreen();
+       _navigateToNextScreen();
     });
   }
 
   Future<void> _navigateToNextScreen() async {
-    bool isLoggedIn = await SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN);
-    // Navigate to the appropriate screen based on login status
-    if (isLoggedIn) {
-      Navigator.pushReplacementNamed(context, '/home');
+    final storage = new FlutterSecureStorage();
+    final temp = await storage.read(key: "me");
+    log("${temp}");
+
+    if (temp != null) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>HomePage()));
     } else {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>Landingpage()));
     }
   }
 
@@ -44,11 +52,28 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Constants.APPCOLOUR,
       body: Center(
-        child: SvgPicture.asset(
-          'assets/svgIcons/applogo.svg', // Replace with your SVG file path
-          height: 100, // Adjust height as needed
-          width: 100, // Adjust width as needed
-        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/svgIcons/applogo.svg', // Replace with your SVG file path
+              height: 100, // Adjust height as needed
+              width: 100, // Adjust width as needed
+            ),
+            SizedBox(height: 20,),
+            Text(
+              'SEMBREAKER',
+              style: GoogleFonts.epilogue(
+                textStyle: TextStyle(
+                  fontSize: 40,
+                  color: Constants.WHITE,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        )
       ),
     );
   }

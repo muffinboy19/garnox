@@ -44,11 +44,45 @@ class APIs {
     }
   }
 
+//-----------------------------Fetch the user data-------------------------------------------------//
+  static Future<void> myInfo() async{
+    log("${user_uid}");
+    final storage = new FlutterSecureStorage();
+    await firestore.collection('user').doc(user_uid).get().then((user) async {
+      if (user.exists) {
+
+        me = ChatUser.fromJson(user.data()!);
+        var res = (ChatUser.fromJson(user.data()!)).toJson();
+        await storage.write(key: "me", value: jsonEncode(res));
+        log("${me!.imageUrl}");
+      } else {
+        log("NO SUCH USER FOUND {Failed to load myINFO}");
+      }
+    });
+  }
+
+//-----------------------------If User Exists Store All the Data From Local Storage to me-------------------//
+  static Future<void> offlineInfo() async {
+    final storage = new FlutterSecureStorage();
+    try {
+      String? stringOfItems = await storage.read(key: "me");
+      if (stringOfItems != null) {
+        log("Allah ho Akbar");
+        Map<String, dynamic> jsonData = jsonDecode(stringOfItems);
+        me = ChatUser.fromJson(jsonData);
+        log("Hey this is me: ${me}");
+      } else {
+        await myInfo();
+      }
+    } catch (e) {
+      log("NO SUCH Offline User FOUND {Failed to load offline Info ${e}}");
+    }
+  }
+
 //-----------------------------check user exists-----------------------------------//
   static Future<bool> userExists() async {
     return (await firestore.collection('users').doc(user.uid).get()).exists;
   }
-
 
 //-----------------------------create user through google-----------------------------------//
   static Future<void> createGoogleUser() async {
@@ -64,7 +98,6 @@ class APIs {
         .set(chatUser.toJson());
   }
 
-
 //-----------------------------check user-----------------------------------//
   static Future<void> createUser(String collName, String id, String email, String name) async {
     try {
@@ -77,7 +110,6 @@ class APIs {
       log('Error creating user: $e');
     }
   }
-
 
 //-----------------------------Signup-----------------------------------//
   static Future<void> signup(String email, String password, String firstname, String lastname) async {
@@ -104,11 +136,11 @@ class APIs {
     }
   }
 
-
 //-----------------------------Sign IN-----------------------------------//
   static Future<void> signin(String email, String password) async {
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
+      await myInfo();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         log('No user found for that email.');
@@ -121,7 +153,6 @@ class APIs {
       log('Error during signin: $e');
     }
   }
-
 
 //-----------------------------Google Sign IN-----------------------------------//
   static Future<UserCredential?> googleSignIn()async{
@@ -144,9 +175,7 @@ class APIs {
     }
   }
 
-
 //-----------------------------Fetch All Semister wise subjects-----------------------------------//
-
   static Stream<QuerySnapshot<Map<String, dynamic>>> semViseSubjects() {
     try {
       int year = me!.batch!;
@@ -167,19 +196,6 @@ class APIs {
   }
 
 //-----------------------------Fetch the user data-------------------------------------------------//
-  static Future<void> myInfo() async{
-    log("${user_uid}");
-    await firestore.collection('user').doc(user_uid).get().then((user) async {
-      if (user.exists) {
-        me = ChatUser.fromJson(user.data()!);
-        log("${me!.imageUrl}");
-      } else {
-        log("NO SUCH USER FOUND {Failed to load myINFO}");
-      }
-    });
-  }
-
-//-----------------------------Fetch the user data-------------------------------------------------//
   static Future<void> updateCollegeDetails(int batch , String branch , int semester) async{
 
       try{
@@ -196,4 +212,11 @@ class APIs {
       }
   }
 
+//----------------------------Sign Out User From the Application-----------------------------------//
+  static Future<void> Signout() async{
+    final storage =  new FlutterSecureStorage();
+    await storage.delete(key: "me");
+
+    await auth.signOut();
+  }
 }

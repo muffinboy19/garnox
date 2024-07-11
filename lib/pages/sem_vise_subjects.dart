@@ -26,146 +26,157 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
   List<SemViseSubjects> _list = [];
   final List<SemViseSubjects> _searchList = [];
   final storage = new FlutterSecureStorage();
+  late GlobalKey<RefreshIndicatorState> refreshKey;
 
   @override
   void initState(){
     super.initState();
-
+    refreshKey = GlobalKey<RefreshIndicatorState>();
     APIs.fetchAllSubjects();
   }
 
+  Future<void> _handleRefresh() async {
+    await Future.delayed(Duration(seconds: 1));
+    APIs.fetchAllSubjects();
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return RefreshIndicator(
+      key: refreshKey,
+      onRefresh: _handleRefresh,
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          'Subjects',
-          style: GoogleFonts.epilogue(
-            textStyle: TextStyle(
-              color: Constants.BLACK,
-              fontWeight: FontWeight.bold,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Text(
+            'Subjects',
+            style: GoogleFonts.epilogue(
+              textStyle: TextStyle(
+                color: Constants.BLACK,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            "assets/svgIcons/hamburger.svg",
-            color: Constants.BLACK,
-          ),
-          onPressed: () {
-            // Handle drawer opening
-          },
-        ),
-        actions: [
-          IconButton(
+          leading: IconButton(
             icon: SvgPicture.asset(
-              "assets/svgIcons/notification.svg",
+              "assets/svgIcons/hamburger.svg",
               color: Constants.BLACK,
             ),
             onPressed: () {
-              // Handle notification action
+              // Handle drawer opening
             },
           ),
-        ],
-      ),
-      body:GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: WillPopScope(
-          onWillPop: () {
-            if (_isSearching) {
-              setState(() {
-                _isSearching = !_isSearching;
-              });
-              return Future.value(false);
-            } else {
-              return Future.value(true);
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search subjects...',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+          actions: [
+            IconButton(
+              icon: SvgPicture.asset(
+                "assets/svgIcons/notification.svg",
+                color: Constants.BLACK,
+              ),
+              onPressed: () {
+                // Handle notification action
+              },
+            ),
+          ],
+        ),
+        body:GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: WillPopScope(
+            onWillPop: () {
+              if (_isSearching) {
+                setState(() {
+                  _isSearching = !_isSearching;
+                });
+                return Future.value(false);
+              } else {
+                return Future.value(true);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search subjects...',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onChanged: (text) {
+                        setState(() {
+                          _isSearching = text.isNotEmpty;
+                          _searchText = text;
+                        });
+                        // Implement search logic here
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 16), // Space between search bar and heading
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      "Semister ${APIs.me!.semester}",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onChanged: (text) {
-                      setState(() {
-                        _isSearching = text.isNotEmpty;
-                        _searchText = text;
-                      });
-                      // Implement search logic here
-                    },
                   ),
-                ),
-                SizedBox(height: 16), // Space between search bar and heading
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    "Semister ${APIs.me!.semester}",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Expanded(
-                  child: StreamBuilder(
-                    stream: APIs.semViseSubjects(),
-                    builder: (context,snapshots){
-                       switch(snapshots.connectionState) {
-                         case ConnectionState.waiting:
-                         case ConnectionState.none:
-                         return const Center(
-                           child: CircularProgressIndicator(
-                             color: Colors.blue,
-                           ),
-                         );
-                         case ConnectionState.active:
-                         case ConnectionState.done:
-                         if(snapshots.hasData){
-                           final data = snapshots.data?.docs;
-                           final _list = data?.map((e) => SemViseSubject.fromJson(e.data())).toList() ?? [];
+                  SizedBox(height: 16),
+                  Expanded(
+                    child: StreamBuilder(
+                      stream: APIs.semViseSubjects(),
+                      builder: (context,snapshots){
+                         switch(snapshots.connectionState) {
+                           case ConnectionState.waiting:
+                           case ConnectionState.none:
+                           return const Center(
+                             child: CircularProgressIndicator(
+                               color: Colors.blue,
+                             ),
+                           );
+                           case ConnectionState.active:
+                           case ConnectionState.done:
+                           if(snapshots.hasData){
+                             final data = snapshots.data?.docs;
+                             final _list = data?.map((e) => SemViseSubject.fromJson(e.data())).toList() ?? [];
 
-                           if(_list.isEmpty){
-                             return Center(
-                               child: Text(
-                                 'Home',
-                                 style: GoogleFonts.epilogue(
-                                   textStyle: TextStyle(
-                                     color: Constants.BLACK,
-                                     fontWeight: FontWeight.bold,
+                             if(_list.isEmpty){
+                               return Center(
+                                 child: Text(
+                                   'Home',
+                                   style: GoogleFonts.epilogue(
+                                     textStyle: TextStyle(
+                                       color: Constants.BLACK,
+                                       fontWeight: FontWeight.bold,
+                                     ),
                                    ),
                                  ),
-                               ),
-                             );
+                               );
+                             }else{
+                               return ListView.builder(
+                                   itemCount: _isSearching ? _searchList.length : _list.length,
+                                   itemBuilder: (context, index) {
+                                      return _subCardList(_list[index].ece ?? []);
+                                    }
+                               );
+                             }
                            }else{
-                             return ListView.builder(
-                                 itemCount: _isSearching ? _searchList.length : _list.length,
-                                 itemBuilder: (context, index) {
-                                    return _subCardList(_list[index].ece ?? []);
-                                  }
-                             );
+                              return Center(child:Text("Error"));
                            }
-                         }else{
-                            return Center(child:Text("Error"));
                          }
-                       }
-                    },
-                  )
-                ),
-              ],
+                      },
+                    )
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -240,7 +251,5 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
         ),
       )
       );
-
   }
-
 }

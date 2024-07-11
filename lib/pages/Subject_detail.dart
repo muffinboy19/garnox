@@ -21,6 +21,19 @@ class SubjectDetail extends StatefulWidget {
 class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProviderStateMixin {
   bool _isSearching = false;
   String _searchText = '';
+  late GlobalKey<RefreshIndicatorState> refreshKey;
+
+  @override
+  void initState() {
+    super.initState();
+    refreshKey = GlobalKey<RefreshIndicatorState>();
+  }
+
+  Future<void> _handleRefresh() async {
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {});
+  }
+
 
   @override
   Widget build(BuildContext context) {
