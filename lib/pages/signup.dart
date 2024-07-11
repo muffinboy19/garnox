@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/database/Apis.dart';
+import 'package:untitled1/pages/CollegeDetails.dart';
+import 'package:untitled1/pages/HomePage.dart';
 import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/pages/signIn.dart';
 
@@ -211,7 +213,7 @@ class _SignUpState extends State<SignUp> {
                         // Navigate to the home screen
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (_) => Home()),
+                          MaterialPageRoute(builder: (_) => CollegeDetails()),
                         );
                       } catch (error) {
                         // Dismiss the progress indicator
@@ -297,11 +299,11 @@ class _SignUpState extends State<SignUp> {
 
                         if ((await APIs.userExists())) {
                           Navigator.pushReplacement(
-                              context, MaterialPageRoute(builder: (_) =>  Home()));
+                              context, MaterialPageRoute(builder: (_) =>  CollegeDetails()));
                         } else {
                           APIs.createGoogleUser().then((value) => {
                             Navigator.pushReplacement(context,
-                                MaterialPageRoute(builder: (_) =>  Home()))
+                                MaterialPageRoute(builder: (_) =>  CollegeDetails()))
                           });
                         }
                       }

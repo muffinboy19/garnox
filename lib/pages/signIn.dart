@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:untitled1/components/custom_helpr.dart';
 import 'package:untitled1/database/Apis.dart';
+import 'package:untitled1/pages/HomePage.dart';
 import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/pages/signup.dart';
 
@@ -163,7 +165,7 @@ class _SigninState extends State<Signin> {
                             // Navigate to the home screen
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (_) => Home()),
+                              MaterialPageRoute(builder: (_) => HomePage()),
                             );
                           } catch (error) {
                             // Dismiss the progress indicator
@@ -246,12 +248,9 @@ class _SigninState extends State<Signin> {
 
                             if ((await APIs.userExists())) {
                               Navigator.pushReplacement(
-                                  context, MaterialPageRoute(builder: (_) =>  Home()));
+                                  context, MaterialPageRoute(builder: (_) =>  HomePage()));
                             } else {
-                              APIs.createGoogleUser().then((value) => {
-                                Navigator.pushReplacement(context,
-                                    MaterialPageRoute(builder: (_) =>  Home()))
-                              });
+                               Dialogs.showSnackbar(context, "Please Create New Account");
                             }
                           }
                         });

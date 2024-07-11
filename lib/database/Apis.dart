@@ -12,9 +12,11 @@ import 'package:untitled1/pages/subject.dart';
 
 class APIs {
   static FirebaseAuth auth = FirebaseAuth.instance;
-  static User get user=> auth.currentUser!;
+  static User get user=> auth.currentUser!;                          //google user
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
-  
+  static ChatUser? me;                                                //my info
+  static final user_uid = auth.currentUser!.uid;
+
 //--------------FETCH ALL SUBJECTS DATA AND STORE IT INTO LOCAL STORAGE--------------------------------------------//
   static Future<void> fetchAllSubjects() async {
     final storage = new FlutterSecureStorage();
@@ -162,5 +164,35 @@ class APIs {
       return const Stream.empty();
     }
   }
-  
+
+//-----------------------------Fetch the user data-------------------------------------------------//
+  static Future<void> myInfo() async{
+    log("${user_uid}");
+    await firestore.collection('user').doc(user_uid).get().then((user) async {
+      if (user.exists) {
+        me = ChatUser.fromJson(user.data()!);
+        log("${me!.imageUrl}");
+      } else {
+        log("NO SUCH USER FOUND {Failed to load myINFO}");
+      }
+    });
+  }
+
+//-----------------------------Fetch the user data-------------------------------------------------//
+  static Future<void> updateCollegeDetails(int batch , String branch , int semester) async{
+
+      try{
+        await firestore.collection("user").doc(user_uid).update({
+          "batch" : batch,
+          "branch" : branch,
+          "college" : "IIIT Allahabad",
+          "semester" : semester,
+        });
+
+        log("College Details Updated");
+      }catch(e){
+        log("Error in updating college details: ${e}");
+      }
+  }
+
 }

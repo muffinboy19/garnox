@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,9 +11,11 @@ import 'package:untitled1/database/Locals.dart';
 import 'package:untitled1/models/SemViseSubModel.dart';
 import 'package:untitled1/models/SpecificSubjectModel.dart';
 import 'package:untitled1/models/recentsModel.dart';
+import 'package:untitled1/pages/ProfilePage.dart';
 import 'package:untitled1/pages/Subject_detail.dart';
 import 'package:untitled1/pages/sem_vise_subjects.dart';
 import 'package:untitled1/utils/contstants.dart';
+import 'package:untitled1/components/Custom_navDrawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,6 +30,13 @@ class _HomePageState extends State<HomePage> {
   final List<SemViseSubjects> _searchList = [];
   final storage = new FlutterSecureStorage();
   List<Recents> _list =[];
+
+  @override
+  void initState(){
+    super.initState();
+    APIs.myInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +45,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'Home',
+          'HomePage',
           style: GoogleFonts.epilogue(
             textStyle: TextStyle(
               color: Constants.BLACK,
@@ -51,7 +59,7 @@ class _HomePageState extends State<HomePage> {
             color: Constants.BLACK,
           ),
           onPressed: () {
-            // Handle drawer opening
+              Scaffold.of(context).openDrawer();
           },
         ),
         actions: [
@@ -61,11 +69,12 @@ class _HomePageState extends State<HomePage> {
               color: Constants.BLACK,
             ),
             onPressed: () {
-              // Handle notification action
+               Navigator.push(context,MaterialPageRoute(builder: (_)=>ProfilePage()));
             },
           ),
         ],
       ),
+      drawer: CustomNavDrawer(),
       body:
       GestureDetector(
         onTap: ()=> Focus.of(context).unfocus(),

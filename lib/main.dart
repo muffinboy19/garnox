@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled1/pages/CollegeDetails.dart';
 import 'package:untitled1/pages/HomePage.dart';
+import 'package:untitled1/pages/ProfilePage.dart';
 import 'package:untitled1/pages/about.dart';
 import 'package:untitled1/pages/admin.dart';
 import 'package:untitled1/pages/announcements.dart';
@@ -105,7 +107,8 @@ class _MyAppState extends State<MyApp> {
         future: SharedPreferencesUtil.getBooleanValue(Constants.USER_LOGGED_IN),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data! ? HomePage() : HomePage();
+            return snapshot.data! ? Landingpage() : Landingpage()
+            ;
           } else {
             return Blank();
           }
