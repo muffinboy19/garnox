@@ -149,8 +149,9 @@ class APIs {
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> semViseSubjects() {
     try {
+      int year = me!.batch!;
       final stream = APIs.firestore.collection('Data')
-          .where('yearName', isEqualTo: "2026")
+          .where('yearName', isEqualTo: year.toString())
           .snapshots();
       stream.listen((snapshot) {
         for (var doc in snapshot.docs) {

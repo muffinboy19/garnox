@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:untitled1/components/custom_helpr.dart';
 import 'package:untitled1/database/Apis.dart';
 import 'package:untitled1/pages/EditProfile.dart';
+import 'package:untitled1/pages/HomePage.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -44,7 +45,9 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white,),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>HomePage()));
+          },
         ),
         actions: [
           IconButton(

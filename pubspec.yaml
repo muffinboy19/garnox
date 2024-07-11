@@ -68,7 +68,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_secure_storage: ^9.2.2
   toggle_switch: ^2.3.0
-
+  syncfusion_flutter_pdfviewer: ^26.1.41
 
 
 

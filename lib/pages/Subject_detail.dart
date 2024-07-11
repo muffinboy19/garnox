@@ -4,7 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:untitled1/database/Apis.dart';
 import 'package:untitled1/database/Locals.dart';
 import 'package:untitled1/models/SpecificSubjectModel.dart';
+import 'package:untitled1/pages/OpenPdf.dart';
 import 'package:untitled1/utils/contstants.dart';
+
+import '../components/custom_helpr.dart';
 
 class SubjectDetail extends StatefulWidget {
   final SpecificSubject subject;
@@ -131,11 +134,11 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
   Widget _buildTabContent(String type) {
     List<Widget> items = [];
     if (type == "material") {
-      items = widget.subject.material.map((item) => _subCard(item.title, item.contentURL)).toList();
+      items = widget.subject.material.map((item) => _subCard(item.title, item.contentURL ,"material")).toList();
     } else if (type == "papers") {
-      items = widget.subject.questionPapers.map((item) => _subCard(item.title, item.url)).toList();
+      items = widget.subject.questionPapers.map((item) => _subCard(item.title, item.url ,"papers")).toList();
     } else if (type == "links") {
-      items = widget.subject.importantLinks.map((item) => _subCard(item.title, item.contentURL)).toList();
+      items = widget.subject.importantLinks.map((item) => _subCard(item.title, item.contentURL ,"links")).toList();
     } else {
       return Center(child: Text("No Data Found"));
     }
@@ -146,10 +149,19 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
     );
   }
 
-  Widget _subCard(String title, String type) {
+  Widget _subCard(String title, String link ,String type) {
     return InkWell(
       onTap: () async{
-          LOCALs.recents(title, type);
+          // LOCALs.recents(title,link,type);
+          if(type == "material" || type == "papers"){
+            Navigator.push(context, MaterialPageRoute(builder: (_)=>OpenPdf(link: link)));
+          }else{
+            try{
+              LOCALs.launchURL(link);
+            }catch(e){
+              Dialogs.showSnackbar(context, "Unable to Load Url: Error(${e})");
+            }
+          }
       },
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20),

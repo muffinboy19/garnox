@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -43,7 +42,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'Home',
+          'Subjects',
           style: GoogleFonts.epilogue(
             textStyle: TextStyle(
               color: Constants.BLACK,
@@ -113,7 +112,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
-                    "Semister 1",
+                    "Semister ${APIs.me!.semester}",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
