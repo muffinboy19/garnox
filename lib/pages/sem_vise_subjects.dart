@@ -23,8 +23,8 @@ class SemViseSubjects extends StatefulWidget {
 class _SemViseSubjectsState extends State<SemViseSubjects> {
   bool _isSearching = false;
   String _searchText = "";
-  List<SemViseSubjects> _list = [];
-  final List<SemViseSubjects> _searchList = [];
+  final List<SemViseSubject> _searchList = [];
+  List<SemViseSubject> _list = [];
   final storage = new FlutterSecureStorage();
   late GlobalKey<RefreshIndicatorState> refreshKey;
 
@@ -36,8 +36,9 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
   }
 
   Future<void> _handleRefresh() async {
+    await APIs.fetchSemSubjectName();
+    await APIs.fetchAllSubjects();
     await Future.delayed(Duration(seconds: 1));
-    APIs.fetchAllSubjects();
   }
 
 
@@ -101,22 +102,46 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search subjects...',
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      onChanged: (text) {
-                        setState(() {
-                          _isSearching = text.isNotEmpty;
-                          _searchText = text;
-                        });
-                        // Implement search logic here
-                      },
-                    ),
+                    child: _isSearching
+                          ? TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Tutorial 3.pdf , MulltimeterUse(LAB).pdf....',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          onChanged: (val) {
+                              _searchList.clear();
+                              //
+                              // for (var i in _list) {
+                              //   if (i.name
+                              //       .toLowerCase()
+                              //       .contains(val.toLowerCase()) ||
+                              //       i.email
+                              //           .toLowerCase()
+                              //           .contains(val.toLowerCase())) {
+                              //     _searchList.add(i);
+                              //   }
+                              //   setState(() {
+                              //     _searchList;
+                              //   });
+                              // }
+                          },
+                        ):TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search subjects...',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          onChanged: (text) {
+                            setState(() {
+                            });
+                            // Implement search logic here
+                          },
+                        )
                   ),
                   SizedBox(height: 16), // Space between search bar and heading
                   Padding(
@@ -131,49 +156,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
                   ),
                   SizedBox(height: 16),
                   Expanded(
-                    child: StreamBuilder(
-                      stream: APIs.semViseSubjects(),
-                      builder: (context,snapshots){
-                         switch(snapshots.connectionState) {
-                           case ConnectionState.waiting:
-                           case ConnectionState.none:
-                           return const Center(
-                             child: CircularProgressIndicator(
-                               color: Colors.blue,
-                             ),
-                           );
-                           case ConnectionState.active:
-                           case ConnectionState.done:
-                           if(snapshots.hasData){
-                             final data = snapshots.data?.docs;
-                             final _list = data?.map((e) => SemViseSubject.fromJson(e.data())).toList() ?? [];
-
-                             if(_list.isEmpty){
-                               return Center(
-                                 child: Text(
-                                   'Home',
-                                   style: GoogleFonts.epilogue(
-                                     textStyle: TextStyle(
-                                       color: Constants.BLACK,
-                                       fontWeight: FontWeight.bold,
-                                     ),
-                                   ),
-                                 ),
-                               );
-                             }else{
-                               return ListView.builder(
-                                   itemCount: _isSearching ? _searchList.length : _list.length,
-                                   itemBuilder: (context, index) {
-                                      return _subCardList(_list[index].ece ?? []);
-                                    }
-                               );
-                             }
-                           }else{
-                              return Center(child:Text("Error"));
-                           }
-                         }
-                      },
-                    )
+                      child: _subCardList(APIs.semSubjectName?.ece ?? [])
                   ),
                 ],
               ),
@@ -196,60 +179,65 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
     List<String> parts = subName.split('_');
     String number ="";
     String department ="";
+    bool check = false;
 
     if (parts.length == 2) {
       number = parts[0]; // "1"
       department = parts[1]; // "ECE"
+      check = (number == APIs.me!.semester.toString());
     } else {
       print("Invalid format");
     }
-    return
-      Padding(padding: EdgeInsets.symmetric(horizontal: 20),
-      child:
-      InkWell(
-        onTap: () async{
-          var temp = await storage.read(key: "$department");
-          if (temp != null) {
-            Map<String, dynamic> tempJson = json.decode(temp);
-            SpecificSubject specificSubject = SpecificSubject.fromJson(tempJson);
+    if(check){
+      return Padding(padding: EdgeInsets.symmetric(horizontal: 20),
+          child:
+          InkWell(
+            onTap: () async{
+              var temp = await storage.read(key: "$department");
+              if (temp != null) {
+                Map<String, dynamic> tempJson = json.decode(temp);
+                SpecificSubject specificSubject = SpecificSubject.fromJson(tempJson);
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => SubjectDetail(subject: specificSubject),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SubjectDetail(subject: specificSubject),
+                  ),
+                );
+              } else {
+                Dialogs.showSnackbar(context, "No data found");
+              }
+            },
+
+            child: Card(
+              color: Color.fromRGBO(232, 229, 239, 1),
+              child: ListTile(
+                leading: IconButton(
+                  icon: SvgPicture.asset(
+                    "assets/svgIcons/file.svg",
+                  ),
+                  onPressed: () {
+                    // Handle drawer opening
+
+                  },
+                ),
+                title: Text(department ,style: GoogleFonts.epilogue(
+                  textStyle: TextStyle(
+                    color: Constants.BLACK,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),),
+                subtitle: Text("12 Files"),
+                trailing: IconButton(
+                  onPressed: (){},
+                  icon: Icon(Icons.more_vert),
+                ),
               ),
-            );
-          } else {
-            Dialogs.showSnackbar(context, "No data found");
-          }
-        },
-
-        child: Card(
-          color: Color.fromRGBO(232, 229, 239, 1),
-          child: ListTile(
-            leading: IconButton(
-              icon: SvgPicture.asset(
-                "assets/svgIcons/file.svg",
-              ),
-              onPressed: () {
-                // Handle drawer opening
-
-              },
             ),
-            title: Text(department ,style: GoogleFonts.epilogue(
-              textStyle: TextStyle(
-                color: Constants.BLACK,
-                fontWeight: FontWeight.bold,
-              ),
-            ),),
-            subtitle: Text("12 Files"),
-            trailing: IconButton(
-              onPressed: (){},
-              icon: Icon(Icons.more_vert),
-            ),
-          ),
-        ),
-      )
+          )
       );
+    }else{
+      return Container();
+    }
   }
 }

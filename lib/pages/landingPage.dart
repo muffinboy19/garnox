@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:untitled1/pages/AuthPage.dart';
 import 'package:untitled1/pages/signIn.dart';
 import 'package:untitled1/pages/signup.dart';
 import 'package:untitled1/utils/landing_info.dart';
@@ -44,7 +45,7 @@ class _LandingpageState extends State<Landingpage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => SignUp(),
+                    builder: (_) => Auth(),
                   ),
                 );
               },
@@ -133,7 +134,7 @@ class _LandingpageState extends State<Landingpage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => Signin(),
+                                builder: (_) => Auth(),
                               ),
                             );
                           },
@@ -168,7 +169,7 @@ class _LandingpageState extends State<Landingpage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => SignUp(),
+                                builder: (_) => Auth(),
                               ),
                             );
                           },

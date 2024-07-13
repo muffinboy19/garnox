@@ -4,17 +4,21 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:untitled1/models/SemViseSubModel.dart';
 import 'package:untitled1/models/SpecificSubjectModel.dart';
 import 'package:untitled1/models/chatuser.dart';
 import 'package:untitled1/pages/sem_vise_subjects.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:untitled1/pages/subject.dart';
+import 'package:untitled1/models/SemViseSubModel.dart';
 
 class APIs {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static User get user=> auth.currentUser!;                          //google user
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
-  static ChatUser? me;                                                //my info
+  static ChatUser? me;  //my info
+  static SemViseSubject? semSubjectName;
+  static SpecificSubject? allSubject;                              //no usage
   static final user_uid = auth.currentUser!.uid;
 
 //--------------FETCH ALL SUBJECTS DATA AND STORE IT INTO LOCAL STORAGE--------------------------------------------//
@@ -44,6 +48,28 @@ class APIs {
     }
   }
 
+//--------------FETCH ALL SUBJECTS Name Based on the Semester AND STORE IT INTO LOCAL STORAGE--------------------------------------------//
+  static Future<void> fetchSemSubjectName() async{
+
+    int yearName = me!.batch!;
+    int semesterName = me!.semester!;
+    String branchName = me!.branch!;
+    String keyName = "${yearName}";
+
+    final storage = new FlutterSecureStorage();
+    await firestore.collection('Data').doc(yearName.toString()).get().then((user) async {
+      if (user.exists) {
+        log("Thala For a Reason");
+        semSubjectName = SemViseSubject.fromJson(user.data()!);
+        var res = (SemViseSubject.fromJson(user.data()!)).toJson();
+        await storage.write(key: keyName, value: jsonEncode(res));
+
+      } else {
+        log("NO Sem Subject Data FOUND {Failed to load SemSubjectName}");
+      }
+    });
+  }
+
 //-----------------------------Fetch the user data-------------------------------------------------//
   static Future<void> myInfo() async{
     log("${user_uid}");
@@ -64,6 +90,7 @@ class APIs {
 //-----------------------------If User Exists Store All the Data From Local Storage to me-------------------//
   static Future<void> offlineInfo() async {
     final storage = new FlutterSecureStorage();
+
     try {
       String? stringOfItems = await storage.read(key: "me");
       if (stringOfItems != null) {
@@ -74,6 +101,19 @@ class APIs {
       } else {
         await myInfo();
       }
+
+      int yearName = me!.batch!;
+
+      String? stringofsemSubjectName = await storage.read(key: "${yearName}");
+      if (stringofsemSubjectName != null) {
+        log("Heisenburg");
+        Map<String, dynamic> jsonData = jsonDecode(stringofsemSubjectName);
+        semSubjectName = SemViseSubject.fromJson(jsonData);
+        log("Hey this is SemSubjectName : ${semSubjectName}");
+      } else {
+        await fetchSemSubjectName();
+      }
+
     } catch (e) {
       log("NO SUCH Offline User FOUND {Failed to load offline Info ${e}}");
     }
@@ -215,7 +255,7 @@ class APIs {
 //----------------------------Sign Out User From the Application-----------------------------------//
   static Future<void> Signout() async{
     final storage =  new FlutterSecureStorage();
-    await storage.delete(key: "me");
+    await storage.deleteAll();
 
     await auth.signOut();
   }

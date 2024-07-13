@@ -54,7 +54,7 @@ class _CollegeDetailsState extends State<CollegeDetails> {
 
                 try {
                   // Perform the update operation
-                  await APIs.updateCollegeDetails(2027, "ITBI", 1);
+                  await APIs.updateCollegeDetails(2026, "ITBI", 1);
 
                   // Dismiss the progress indicator
                   Navigator.pop(context);

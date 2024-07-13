@@ -69,6 +69,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   toggle_switch: ^2.3.0
   syncfusion_flutter_pdfviewer: ^26.1.41
+  flutter_file_downloader: ^2.0.0
 
 
 

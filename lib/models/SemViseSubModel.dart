@@ -11,7 +11,7 @@ class SemViseSubject {
   final List<String>? it;
   final String? yearName;
 
-  SemViseSubject.fromJson(Map<String, dynamic> json)
+  SemViseSubject.fromJson(Map<dynamic, dynamic> json)
       : itBi = (json['IT-BI'] as List<dynamic>?)?.cast<String>(),
         ece = (json['ECE'] as List<dynamic>?)?.cast<String>(),
         it = (json['IT'] as List<dynamic>?)?.cast<String>(),

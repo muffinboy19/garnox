@@ -165,7 +165,7 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
   Widget _subCard(String title, String link ,String type) {
     return InkWell(
       onTap: () async{
-          // LOCALs.recents(title,link,type);
+          LOCALs.recents(title,link,type);
           if(type == "material" || type == "papers"){
             Navigator.push(context, MaterialPageRoute(builder: (_)=>OpenPdf(link: link)));
           }else{

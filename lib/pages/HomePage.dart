@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,6 @@ import 'package:untitled1/pages/Subject_detail.dart';
 import 'package:untitled1/pages/sem_vise_subjects.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/components/Custom_navDrawer.dart';
-
 import 'OpenPdf.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,6 +35,8 @@ class _HomePageState extends State<HomePage> {
   final storage = FlutterSecureStorage();
   List<Recents> _list = [];
   late GlobalKey<RefreshIndicatorState> refreshKey;
+  List<String> eceList =[];
+
 
   @override
   void initState() {
@@ -44,11 +46,17 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _initializeData() async {
     await APIs.offlineInfo();
+    eceList = await APIs.semSubjectName?.ece ?? [];
   }
 
   Future<void> _handleRefresh() async {
     await Future.delayed(Duration(seconds: 1));
-    setState(() {});
+    await APIs.fetchAllSubjects();
+    await APIs.fetchSemSubjectName();
+    setState(() {
+      eceList = APIs.semSubjectName?.ece ?? [];
+    });
+
   }
 
   @override
@@ -160,52 +168,8 @@ class _HomePageState extends State<HomePage> {
                             fontSize: 25,
                           ),
                         ),
-                        Container(
-                          height: 250,
-                          child: StreamBuilder(
-                            stream: APIs.semViseSubjects(),
-                            builder: (context, snapshots) {
-                              switch (snapshots.connectionState) {
-                                case ConnectionState.waiting:
-                                case ConnectionState.none:
-                                  return const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.blue,
-                                    ),
-                                  );
-                                case ConnectionState.active:
-                                case ConnectionState.done:
-                                  if (snapshots.hasData) {
-                                    final data = snapshots.data?.docs;
-                                    final _list = data?.map((e) => SemViseSubject.fromJson(e.data())).toList() ?? [];
-
-                                    if (_list.isEmpty) {
-                                      return Center(
-                                        child: Text(
-                                          'No Data Found',
-                                          style: GoogleFonts.epilogue(
-                                            textStyle: TextStyle(
-                                              color: Constants.BLACK,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: _isSearching ? _searchList.length : _list.length,
-                                        itemBuilder: (context, index) {
-                                          return _subCardList(_list[index].ece ?? []);
-                                        },
-                                      );
-                                    }
-                                  } else {
-                                    return Center(child: Text("Server is down"));
-                                  }
-                              }
-                            },
-                          ),
+                        Expanded(
+                          child: _subCardList()
                         ),
                         Text(
                           "My Files",
@@ -295,7 +259,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _subCardList(List<String> eceList) {
+  Widget _subCardList() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -310,89 +274,97 @@ class _HomePageState extends State<HomePage> {
     List<String> parts = subName.split('_');
     String number = "";
     String department = "";
+    bool check = true;
+
 
     if (parts.length == 2) {
       number = parts[0]; // "1"
-      department = parts[1]; // "ECE"
+      department = parts[1];
+      check = (number == APIs.me!.semester.toString());
     } else {
       print("Invalid format");
     }
-    return InkWell(
-      onTap: () async {
-        var temp = await storage.read(key: "$department");
-        Dialogs.showProgressBar(context);
+    if(check){
+      return InkWell(
+        onTap: () async {
+          var temp = await storage.read(key: "$department");
+          Dialogs.showProgressBar(context);
 
-        if (temp != null) {
-          Map<String, dynamic> tempJson = json.decode(temp);
-          SpecificSubject specificSubject = SpecificSubject.fromJson(tempJson);
+          if (temp != null) {
+            Map<String, dynamic> tempJson = json.decode(temp);
+            SpecificSubject specificSubject = SpecificSubject.fromJson(tempJson);
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => SubjectDetail(subject: specificSubject),
-            ),
-          ).then((_) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SubjectDetail(subject: specificSubject),
+              ),
+            ).then((_) {
+              Navigator.pop(context);
+            });
+          } else {
             Navigator.pop(context);
-          });
-        } else {
-          Navigator.pop(context);
-          Dialogs.showSnackbar(context, "No data found");
-        }
-      },
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 25),
-        child: Container(
-          color: Colors.white,
+            Dialogs.showSnackbar(context, "No data found");
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 25),
           child: Container(
-            height: 180,
-            width: 150,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  child: Container(
-                    width: double.infinity,
-                    height: 120,
-                    color: Color.fromRGBO(232, 229, 239, 1),
-                    child: Padding(
-                      padding: const EdgeInsets.all(45.0),
-                      child: SvgPicture.asset(
-                        "assets/svgIcons/file.svg",
+            color: Colors.white,
+            child: Container(
+              height: 180,
+              width: 150,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    child: Container(
+                      width: double.infinity,
+                      height: 120,
+                      color: Color.fromRGBO(232, 229, 239, 1),
+                      child: Padding(
+                        padding: const EdgeInsets.all(45.0),
+                        child: SvgPicture.asset(
+                          "assets/svgIcons/file.svg",
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Text(
-                    department,
-                    style: GoogleFonts.epilogue(
-                      textStyle: TextStyle(
-                        color: Constants.BLACK,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Text(
+                      department,
+                      style: GoogleFonts.epilogue(
+                        textStyle: TextStyle(
+                          color: Constants.BLACK,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(0),
-                  child: Text(
-                    "12 files",
-                    style: GoogleFonts.epilogue(
-                      textStyle: TextStyle(
-                        color: Constants.BLACK,
+                  Padding(
+                    padding: EdgeInsets.all(0),
+                    child: Text(
+                      "12 files",
+                      style: GoogleFonts.epilogue(
+                        textStyle: TextStyle(
+                          color: Constants.BLACK,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    }else{
+      return Container();
+    }
+
   }
 
   Widget _fileCard(Recents temp) {
@@ -418,7 +390,7 @@ class _HomePageState extends State<HomePage> {
                 "assets/svgIcons/file.svg",
               ),
               onPressed: () {
-                // Handle drawer opening
+
               },
             ),
             title: Text(
@@ -432,12 +404,66 @@ class _HomePageState extends State<HomePage> {
             ),
             subtitle: Text("12 Files"),
             trailing: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                _showBottomSheet(temp.URL);
+              },
               icon: Icon(Icons.more_vert),
             ),
           ),
         ),
       ),
     );
+  }
+
+  void _showBottomSheet(String URL) {
+    var mq = MediaQuery.of(context).size;
+    showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        builder: (_) {
+          return ListView(
+            shrinkWrap: true,
+            padding:
+            EdgeInsets.only(top: mq.height * .01, bottom: mq.height * .05),
+            children: [
+              // const Text(
+              //   'Pick Profile Picture',
+              //   textAlign: TextAlign.center,
+              //   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+              // ),
+              Divider(indent: 50,endIndent: 50,color: Colors.grey,thickness: 5,),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          backgroundColor: Colors.white,
+                          fixedSize: Size(mq.width * .3, mq.height * .15)),
+                      onPressed: () async {
+                      },
+                      // child: Image.asset('assets/blue icons/share-Recovered.png')),
+                      child: SvgPicture.asset("assets/svgIcons/file.svg",),),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          backgroundColor: Colors.white,
+                          fixedSize: Size(mq.width * .3, mq.height * .15)),
+                      onPressed: () async {
+                        FileDownloader.downloadFile(url: URL , onDownloadCompleted:(value){log("yoyoyo downloaded:${value}");},
+                        onDownloadError:(e){log("error in downloading : ${e}");} ,);
+                      },
+                    child: Image.asset("assets/svgIcons/download.png",),),
+                      // child: Image.asset('assets/blue icons/download-Recovered.png'))
+                ],
+              )
+            ],
+          );
+        });
   }
 }
