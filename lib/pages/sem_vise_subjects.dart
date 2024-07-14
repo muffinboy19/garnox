@@ -11,6 +11,7 @@ import 'package:untitled1/pages/subjects_admin.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/models/SemViseSubModel.dart';
 
+import '../components/Custom_navDrawer.dart';
 import '../models/SpecificSubjectModel.dart';
 
 class SemViseSubjects extends StatefulWidget {
@@ -67,7 +68,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
               color: Constants.BLACK,
             ),
             onPressed: () {
-              // Handle drawer opening
+              Scaffold.of(context).openDrawer();
             },
           ),
           actions: [
@@ -82,6 +83,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
             ),
           ],
         ),
+        drawer: CustomNavDrawer(),
         body:GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: WillPopScope(

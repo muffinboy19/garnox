@@ -20,6 +20,7 @@ import 'package:untitled1/pages/sem_vise_subjects.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/components/Custom_navDrawer.dart';
 import 'OpenPdf.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -69,14 +70,7 @@ class _HomePageState extends State<HomePage> {
         future: _initializeData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.blue,
-                ),
-              ),
-            );
+            return Scaffold(backgroundColor: Colors.white  ,body:_buildShimmer());
           } else if (snapshot.hasError) {
             return Scaffold(
               backgroundColor: Colors.white,
@@ -466,4 +460,168 @@ class _HomePageState extends State<HomePage> {
           );
         });
   }
+
+  Widget _buildShimmer() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 30,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                 Row(
+                   children: [
+                     IconButton(
+                       icon: SvgPicture.asset(
+                         "assets/svgIcons/hamburger.svg",
+                         color: Constants.BLACK,
+                       ),
+                       onPressed: () {
+                       },
+                     ),
+                     SizedBox(width: 10,),
+                     Text(
+                       'Home',
+                       style: GoogleFonts.epilogue(
+                         textStyle: TextStyle(
+                           fontSize: 25,
+                           color: Constants.BLACK,
+                           fontWeight: FontWeight.bold,
+                         ),
+                       ),
+                     ),
+                   ],
+                 ),
+                 IconButton(
+                    icon: SvgPicture.asset(
+                      "assets/svgIcons/notification.svg",
+                      color: Constants.BLACK,
+                    ),
+                    onPressed: () {
+
+                    },
+                  ),
+              ]
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search subjects...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                onChanged: (text) {
+                  setState(() {
+                    _isSearching = text.isNotEmpty;
+                  });
+                  // Implement search logic here
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "Subjects",
+              style: GoogleFonts.epilogue(
+                textStyle: TextStyle(
+                  color: Constants.BLACK,
+                  fontWeight: FontWeight.bold,
+                ),
+                fontSize: 25,
+              ),
+            ),
+            SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(5, (index) => _buildSubCardShimmer()),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "My Files",
+              style: GoogleFonts.epilogue(
+                textStyle: TextStyle(
+                  color: Constants.BLACK,
+                  fontWeight: FontWeight.bold,
+                ),
+                fontSize: 25,
+              ),
+            ),
+            SizedBox(height: 10),
+            _buildFileShimmer(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubCardShimmer() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 25),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          height: 180,
+          width: 150,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  width: double.infinity,
+                  height: 120,
+                  color: Color.fromRGBO(232, 229, 239, 1),
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: 100,
+                height: 20,
+                color: Colors.white,
+              ),
+              SizedBox(height: 5),
+              Container(
+                width: 50,
+                height: 20,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFileShimmer() {
+    return Column(
+      children: List.generate(3, (index) => Padding(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            height: 80,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+          ),
+        ),
+      )),
+    );
+  }
+
 }
