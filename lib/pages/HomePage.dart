@@ -30,9 +30,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _isSearching = false;
+  bool issearch = false;
   String _searchText = "";
-  final List<SemViseSubjects> _searchList = [];
+  final List<Recents> _searchList = [];
+  late List<Recents> _findFromSearchList = [];
   final storage = FlutterSecureStorage();
   List<Recents> _list = [];
   late GlobalKey<RefreshIndicatorState> refreshKey;
@@ -42,11 +43,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      issearch = false;
+    });
     refreshKey = GlobalKey<RefreshIndicatorState>();
   }
 
   Future<void> _initializeData() async {
     await APIs.offlineInfo();
+    await LOCALs.MakeSearchFunctionality();
+    _findFromSearchList = await LOCALs.finalSeachDataList?? [];
     eceList = await APIs.semSubjectName?.ece ?? [];
   }
 
@@ -70,7 +76,12 @@ class _HomePageState extends State<HomePage> {
         future: _initializeData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(backgroundColor: Colors.white  ,body:_buildShimmer());
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
           } else if (snapshot.hasError) {
             return Scaffold(
               backgroundColor: Colors.white,
@@ -119,25 +130,26 @@ class _HomePageState extends State<HomePage> {
                 onTap: () => Focus.of(context).unfocus(),
                 child: WillPopScope(
                   onWillPop: () {
-                    if (_isSearching) {
+                    if (issearch) {
                       setState(() {
-                        _isSearching = !_isSearching;
+                          issearch = false;
+                        _searchList.clear();
                       });
                       return Future.value(false);
                     } else {
                       return Future.value(true);
                     }
                   },
-                  child: Padding(
+                  child:Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        issearch ? Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: 'Search subjects...',
+                              hintText: 'Search Subject...',
                               prefixIcon: Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
@@ -145,102 +157,139 @@ class _HomePageState extends State<HomePage> {
                             ),
                             onChanged: (text) {
                               setState(() {
-                                _isSearching = text.isNotEmpty;
+                                _searchList.clear();
+                                _searchText = text;
+
+                                for (var i in _findFromSearchList) {
+                                  if (i.Title
+                                      .toLowerCase()
+                                      .contains(text.toLowerCase())) {
+                                    _searchList.add(i);
+                                  }
+                                }
                               });
                               // Implement search logic here
                             },
                           ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Subjects",
-                          style: GoogleFonts.epilogue(
-                            textStyle: TextStyle(
-                              color: Constants.BLACK,
-                              fontWeight: FontWeight.bold,
+                        ): Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: InkWell(
+                            onTap: (){
+                              setState(() {
+                                issearch = true;
+                              });
+                            },
+                            child: Container(
+                              height: 50,
+                              width: double.infinity,
+                              child: Text("Search Subject here"),
                             ),
-                            fontSize: 25,
-                          ),
+                          )
                         ),
-                        Expanded(
-                          child: _subCardList()
-                        ),
-                        Text(
-                          "My Files",
-                          style: GoogleFonts.epilogue(
-                            textStyle: TextStyle(
-                              color: Constants.BLACK,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            fontSize: 25,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black), // Add black border
-                                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                            SizedBox(height: 20),
+                            Text(
+                             issearch? "Result": "Subjects",
+                              style: GoogleFonts.epilogue(
+                                textStyle: TextStyle(
+                                  color: Constants.BLACK,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.all(Radius.circular(50)),
-                                  child: Container(
-                                    height: 25,
-                                    width: 120,
-                                    child: Center(
-                                      child: Text(
-                                        "Recently used ￬",
-                                        style: TextStyle(fontWeight: FontWeight.w500),
+                                fontSize: 25,
+                              ),
+                            ),
+                            !issearch? Expanded(
+                                child: _subCardList()
+                            ):
+                            SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: _searchList.length,
+                                    itemBuilder: (context, index) {
+                                      return _fileCard(_searchList[index]);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                        if(!issearch) Text(
+                              "My Files",
+                              style: GoogleFonts.epilogue(
+                                textStyle: TextStyle(
+                                  color: Constants.BLACK,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                fontSize: 25,
+                              ),
+                            ),
+                            if(!issearch) Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.black), // Add black border
+                                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                                      child: Container(
+                                        height: 25,
+                                        width: 120,
+                                        child: Center(
+                                          child: Text(
+                                            "Recently used ￬",
+                                            style: TextStyle(fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (_) => RecentsPage()));
-                                },
-                                child: Text(
-                                  "See all",
-                                  style: TextStyle(color: Colors.blue),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        FutureBuilder(
-                          future: LOCALs.fetchRecents(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text("Error: ${snapshot.error}"),
-                              );
-                            } else if (snapshot.hasData) {
-                              _list = snapshot.data!;
-                              return Expanded(
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Column(
-                                    children: _list.map((subName) {
-                                      return _fileCard(subName);
-                                    }).toList(),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (_) => RecentsPage()));
+                                    },
+                                    child: Text(
+                                      "See all",
+                                      style: TextStyle(color: Colors.blue),
+                                    ),
                                   ),
-                                ),
-                              );
-                            } else {
-                              return Center(
-                                child: Text("No Files Found"),
-                              );
-                            }
-                          },
-                        ),
+                                ],
+                              ),
+                            ),
+                        if(!issearch) FutureBuilder(
+                              future: LOCALs.fetchRecents(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text("Error: ${snapshot.error}"),
+                                  );
+                                } else if (snapshot.hasData) {
+                                  _list = snapshot.data!;
+                                  return Expanded(
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.vertical,
+                                      child: Column(
+                                        children: _list.map((subName) {
+                                          return _fileCard(subName);
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Text("No Files Found"),
+                                  );
+                                }
+                              },
+                            )
                       ],
                     ),
                   ),
@@ -518,7 +567,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onChanged: (text) {
                   setState(() {
-                    _isSearching = text.isNotEmpty;
                   });
                   // Implement search logic here
                 },

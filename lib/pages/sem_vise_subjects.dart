@@ -33,7 +33,6 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
   void initState(){
     super.initState();
     refreshKey = GlobalKey<RefreshIndicatorState>();
-    APIs.fetchAllSubjects();
   }
 
   Future<void> _handleRefresh() async {

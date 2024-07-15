@@ -42,6 +42,7 @@ class _AuthState extends State<Auth> {
         log('\nUser Additional Info: ${user.additionalUserInfo}');
 
         if ((await APIs.userExists())) {
+          log("hello hello");
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => const HomePage()));
         } else {

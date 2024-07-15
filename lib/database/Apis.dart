@@ -114,6 +114,16 @@ class APIs {
         await fetchSemSubjectName();
       }
 
+      String? stringofsemAllSubjects = await storage.read(key: "LAL");
+      if (stringofsemAllSubjects != null) {
+        log("Mahatma Gandhi");
+        // Map<String, dynamic> jsonData = jsonDecode(stringofsemAllSubjects);
+        // semSubjectName = SemViseSubject.fromJson(jsonData);
+        // log("Hey this is SemALLSubjects : ${semSubjectName}");
+      }else{
+        await fetchSemSubjectName();
+      }
+
     } catch (e) {
       log("NO SUCH Offline User FOUND {Failed to load offline Info ${e}}");
     }
@@ -121,7 +131,14 @@ class APIs {
 
 //-----------------------------check user exists-----------------------------------//
   static Future<bool> userExists() async {
-    return (await firestore.collection('users').doc(user.uid).get()).exists;
+    final user = auth.currentUser;
+    // log("hello bro");
+    if (user != null) {
+      // log("what are you doing ${user.uid}");
+      final doc = await firestore.collection('user').doc(user.uid).get();
+      return doc.exists;
+    }
+    return false;
   }
 
 //-----------------------------create user through google-----------------------------------//
@@ -255,7 +272,8 @@ class APIs {
 //----------------------------Sign Out User From the Application-----------------------------------//
   static Future<void> Signout() async{
     final storage =  new FlutterSecureStorage();
-    await storage.deleteAll();
+    await storage.delete(key: "me");
+    await storage.delete(key: "${APIs.me!.batch}");
 
     await auth.signOut();
   }
