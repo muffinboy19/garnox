@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:untitled1/pages/SearchPage.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     setState(() {
-      issearch = false;
+      // issearch = false;
     });
     refreshKey = GlobalKey<RefreshIndicatorState>();
   }
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _initializeData() async {
     await APIs.offlineInfo();
     await LOCALs.MakeSearchFunctionality();
-    _findFromSearchList = await LOCALs.finalSeachDataList?? [];
+    // _findFromSearchList = await LOCALs.finalSeachDataList?? [];
     eceList = await APIs.semSubjectName?.ece ?? [];
   }
 
@@ -120,7 +121,6 @@ class _HomePageState extends State<HomePage> {
                       color: Constants.BLACK,
                     ),
                     onPressed: () {
-
                     },
                   ),
                 ],
@@ -131,10 +131,10 @@ class _HomePageState extends State<HomePage> {
                 child: WillPopScope(
                   onWillPop: () {
                     if (issearch) {
-                      setState(() {
-                          issearch = false;
-                        _searchList.clear();
-                      });
+                      // setState(() {
+                      //     issearch = false;
+                      //   _searchList.clear();
+                      // });
                       return Future.value(false);
                     } else {
                       return Future.value(true);
@@ -145,50 +145,33 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        issearch ? Padding(
+                        Padding(
                           padding: const EdgeInsets.only(top: 16.0),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Search Subject...',
-                              prefixIcon: Icon(Icons.search),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            onChanged: (text) {
-                              setState(() {
-                                _searchList.clear();
-                                _searchText = text;
-
-                                for (var i in _findFromSearchList) {
-                                  if (i.Title
-                                      .toLowerCase()
-                                      .contains(text.toLowerCase())) {
-                                    _searchList.add(i);
-                                  }
-                                }
-                              });
-                              // Implement search logic here
+                          child: ListTile(
+                            leading: Icon(Icons.search),
+                            title: Text("Search Subject..."),
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (_)=>SearchPage()));
                             },
                           ),
-                        ): Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
-                          child: InkWell(
-                            onTap: (){
-                              setState(() {
-                                issearch = true;
-                              });
-                            },
-                            child: Container(
-                              height: 50,
-                              width: double.infinity,
-                              child: Text("Search Subject here"),
-                            ),
-                          )
                         ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 16.0),
+                        //   child: InkWell(
+                        //     onTap: (){
+                        //       setState(() {
+                        //       });
+                        //     },
+                        //     child: Container(
+                        //       height: 50,
+                        //       width: double.infinity,
+                        //       child: Text("Search Subject here"),
+                        //     ),
+                        //   )
+                        // ),
                             SizedBox(height: 20),
                             Text(
-                             issearch? "Result": "Subjects",
+                             "Subjects",
                               style: GoogleFonts.epilogue(
                                 textStyle: TextStyle(
                                   color: Constants.BLACK,
@@ -197,24 +180,24 @@ class _HomePageState extends State<HomePage> {
                                 fontSize: 25,
                               ),
                             ),
-                            !issearch? Expanded(
+                            Expanded(
                                 child: _subCardList()
-                            ):
-                            SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: _searchList.length,
-                                    itemBuilder: (context, index) {
-                                      return _fileCard(_searchList[index]);
-                                    },
-                                  ),
-                                ],
-                              ),
                             ),
-                        if(!issearch) Text(
+                            // SingleChildScrollView(
+                            //   child: Column(
+                            //     children: [
+                            //       ListView.builder(
+                            //         physics: NeverScrollableScrollPhysics(),
+                            //         shrinkWrap: true,
+                            //         itemCount: _searchList.length,
+                            //         itemBuilder: (context, index) {
+                            //           return _fileCard(_searchList[index]);
+                            //         },
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
+                            Text(
                               "My Files",
                               style: GoogleFonts.epilogue(
                                 textStyle: TextStyle(
@@ -224,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                                 fontSize: 25,
                               ),
                             ),
-                            if(!issearch) Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 10, bottom: 10),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -260,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             ),
-                        if(!issearch) FutureBuilder(
+                            FutureBuilder(
                               future: LOCALs.fetchRecents(),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {

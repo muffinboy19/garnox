@@ -6,8 +6,8 @@ import 'package:untitled1/database/Locals.dart';
 import 'package:untitled1/models/SpecificSubjectModel.dart';
 import 'package:untitled1/pages/OpenPdf.dart';
 import 'package:untitled1/utils/contstants.dart';
-
 import '../components/custom_helpr.dart';
+import 'SearchPage.dart';
 
 class SubjectDetail extends StatefulWidget {
   final SpecificSubject subject;
@@ -106,22 +106,12 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search subjects...',
-                        fillColor: Colors.white,
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                      ),
-                      onChanged: (text) {
-                        setState(() {
-                          _isSearching = text.isNotEmpty;
-                          _searchText = text;
-                        });
-                        // Implement search logic here
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: ListTile(
+                      leading: Icon(Icons.search),
+                      title: Text("Search Subject..."),
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (_)=>SearchPage()));
                       },
                     ),
                   ),

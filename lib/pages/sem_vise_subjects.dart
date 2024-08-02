@@ -13,6 +13,7 @@ import 'package:untitled1/models/SemViseSubModel.dart';
 
 import '../components/Custom_navDrawer.dart';
 import '../models/SpecificSubjectModel.dart';
+import 'SearchPage.dart';
 
 class SemViseSubjects extends StatefulWidget {
   const SemViseSubjects({super.key});
@@ -102,47 +103,14 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: _isSearching
-                          ? TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Tutorial 3.pdf , MulltimeterUse(LAB).pdf....',
-                            prefixIcon: Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          onChanged: (val) {
-                              _searchList.clear();
-                              //
-                              // for (var i in _list) {
-                              //   if (i.name
-                              //       .toLowerCase()
-                              //       .contains(val.toLowerCase()) ||
-                              //       i.email
-                              //           .toLowerCase()
-                              //           .contains(val.toLowerCase())) {
-                              //     _searchList.add(i);
-                              //   }
-                              //   setState(() {
-                              //     _searchList;
-                              //   });
-                              // }
-                          },
-                        ):TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search subjects...',
-                            prefixIcon: Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          onChanged: (text) {
-                            setState(() {
-                            });
-                            // Implement search logic here
-                          },
-                        )
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: ListTile(
+                      leading: Icon(Icons.search),
+                      title: Text("Search Subject..."),
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (_)=>SearchPage()));
+                      },
+                    ),
                   ),
                   SizedBox(height: 16), // Space between search bar and heading
                   Padding(
