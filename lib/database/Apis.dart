@@ -59,11 +59,11 @@ class APIs {
     final storage = new FlutterSecureStorage();
     await firestore.collection('Data').doc(yearName.toString()).get().then((user) async {
       if (user.exists) {
-        log("Thala For a Reason");
+
         semSubjectName = SemViseSubject.fromJson(user.data()!);
         var res = (SemViseSubject.fromJson(user.data()!)).toJson();
         await storage.write(key: keyName, value: jsonEncode(res));
-
+        log("Thala For a Reason : ${res}");
       } else {
         log("NO Sem Subject Data FOUND {Failed to load SemSubjectName}");
       }
@@ -115,13 +115,13 @@ class APIs {
       }
 
       String? stringofsemAllSubjects = await storage.read(key: "LAL");
-      if (stringofsemAllSubjects != null) {
+      if (stringofsemAllSubjects != null){
         log("Mahatma Gandhi");
         // Map<String, dynamic> jsonData = jsonDecode(stringofsemAllSubjects);
         // semSubjectName = SemViseSubject.fromJson(jsonData);
         // log("Hey this is SemALLSubjects : ${semSubjectName}");
       }else{
-        await fetchSemSubjectName();
+        await fetchAllSubjects();
       }
 
     } catch (e) {

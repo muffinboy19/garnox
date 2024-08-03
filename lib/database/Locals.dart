@@ -51,11 +51,17 @@ class LOCALs{
       String? stringOfItems = await local_storage.read(key: "recents");
       if (stringOfItems != null) {
         List<dynamic> listOfItems = jsonDecode(stringOfItems);
-        return listOfItems.map((item) => Recents.fromJson(item)).toList();
+        List<Recents> recentsList = listOfItems.map((item) => Recents.fromJson(item)).toList();
+
+        final seenTitles = <String>{};
+        recentsList = recentsList.where((recents) => seenTitles.add(recents.Title)).toList();
+
+        return recentsList;
       } else {
         return [];
       }
     }
+
 
     //----------------------Launch Url-----------------------------------------//
     /*

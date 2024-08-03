@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Import for SVG support
 import 'package:google_fonts/google_fonts.dart';
+import 'package:untitled1/pages/CollegeDetails.dart';
 import 'package:untitled1/pages/HomePage.dart';
 import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/pages/SemisterAskingPage.dart';
