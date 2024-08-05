@@ -44,17 +44,23 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      // issearch = false;
-    });
     refreshKey = GlobalKey<RefreshIndicatorState>();
   }
+
 
   Future<void> _initializeData() async {
     await APIs.offlineInfo();
     await LOCALs.MakeSearchFunctionality();
     // _findFromSearchList = await LOCALs.finalSeachDataList?? [];
-    eceList = await APIs.semSubjectName?.ece ?? [];
+    String branchName = APIs.me!.branch!;
+    if(branchName == "ECE"){
+      eceList = await APIs.semSubjectName?.ece ?? [];
+    }else if(branchName == "ITBI"){
+      eceList = await APIs.semSubjectName?.itBi ?? [];
+    }else{
+      eceList = await APIs.semSubjectName?.it ?? [];
+    }
+
   }
 
   Future<void> _handleRefresh() async {

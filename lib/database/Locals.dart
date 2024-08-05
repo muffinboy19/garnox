@@ -44,6 +44,8 @@ class LOCALs{
 
         log("$updatedListOfItems");
       }
+
+      await LOCALs.fetchRecents();
     }
 
     //-------------------Fetch ALL Recents Documents from local storage---------//

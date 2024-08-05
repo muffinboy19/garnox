@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:untitled1/pages/ProfilePage.dart';
@@ -21,12 +22,13 @@ class _EditProfileState extends State<EditProfile> {
   final semesterController = TextEditingController();
   final nameController = TextEditingController();
   final branchController = TextEditingController();
+  final storage = new FlutterSecureStorage();
 
   String Branch = APIs.me!.branch!;
 
   var branchitems = [
     'IT',
-    'IT-BI',
+    'ITBI',
     'ECE',
   ];
 
@@ -363,6 +365,7 @@ class _EditProfileState extends State<EditProfile> {
 
                           try {
                             // Perform the update operation
+                            await storage.delete(key: "${APIs.me!.batch!}");
                             await APIs.updateCollegeDetails(hi(Year), Branch, 1);
                             await APIs.myInfo();
                             await APIs.fetchSemSubjectName();
