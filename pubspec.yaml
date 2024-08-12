@@ -72,6 +72,8 @@ dependencies:
   flutter_file_downloader: ^2.0.0
   shimmer: ^3.0.0
   lottie: ^3.1.2
+  permission_handler: ^11.3.1
+  dio: ^5.5.0+1
 
 
 
