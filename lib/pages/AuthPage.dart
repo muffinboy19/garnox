@@ -45,7 +45,7 @@ class _AuthState extends State<Auth> {
           log("hello hello");
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => const HomePage()));
-        } else {
+        }else{
           APIs.createGoogleUser().then((value) => {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (_) => const CollegeDetails()))

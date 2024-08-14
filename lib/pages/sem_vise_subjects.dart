@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:untitled1/components/custom_helpr.dart';
 import 'package:untitled1/database/Apis.dart';
 import 'package:untitled1/pages/Subject_detail.dart';
-import 'package:untitled1/pages/subjects_admin.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/models/SemViseSubModel.dart';
 
@@ -29,6 +29,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
   List<SemViseSubject> _list = [];
   final storage = new FlutterSecureStorage();
   late GlobalKey<RefreshIndicatorState> refreshKey;
+  Random random = Random();
 
   @override
   void initState(){
@@ -196,7 +197,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),),
-                subtitle: Text("12 Files"),
+                subtitle: Text("${10 + random.nextInt(51)} Files"),
                 trailing: IconButton(
                   onPressed: (){},
                   icon: Icon(Icons.more_vert),

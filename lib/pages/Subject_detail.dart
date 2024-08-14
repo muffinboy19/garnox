@@ -188,7 +188,6 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
                 ),
               ),
             ),
-            subtitle: Text("12 Files"),
             trailing: IconButton(
               onPressed: () {},
               icon: Icon(Icons.more_vert),

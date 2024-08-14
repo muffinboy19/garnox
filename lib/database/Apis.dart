@@ -9,7 +9,6 @@ import 'package:untitled1/models/SpecificSubjectModel.dart';
 import 'package:untitled1/models/chatuser.dart';
 import 'package:untitled1/pages/sem_vise_subjects.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:untitled1/pages/subject.dart';
 import 'package:untitled1/models/SemViseSubModel.dart';
 
 class APIs {
@@ -145,6 +144,10 @@ class APIs {
   static Future<void> createGoogleUser() async {
     final chatUser = ChatUser(
         uid: user.uid,
+        batch: 2026,
+        branch: "ECE",
+        college: "IIIT Allahabad",
+        semester: 1,
         name: user.displayName.toString(),
         email: user.email.toString(),
         imageUrl: user.photoURL.toString());

@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
-
 import '../database/Locals.dart';
 import '../models/recentsModel.dart';
 import '../utils/contstants.dart';
@@ -161,10 +159,9 @@ class _RecentsPageState extends State<RecentsPage> {
                 ),
               ),
             ),
-            subtitle: Text("12 Files"),
             trailing: IconButton(
               onPressed: () {
-                _showBottomSheet(temp.URL);
+                _showBottomSheet(temp.URL , temp.Title);
               },
               icon: Icon(Icons.more_vert),
             ),
@@ -174,7 +171,7 @@ class _RecentsPageState extends State<RecentsPage> {
     );
   }
 
-  void _showBottomSheet(String url) {
+  void _showBottomSheet(String url , String title) {
     var mq = MediaQuery.of(context).size;
     showModalBottomSheet(
       context: context,
@@ -210,7 +207,8 @@ class _RecentsPageState extends State<RecentsPage> {
                     fixedSize: Size(mq.width * .3, mq.height * .15),
                   ),
                   onPressed: () async {
-                    await _downloadFile(url);
+                    log("${url}");
+                    await _downloadFile(url,title);
                   },
                   child: Image.asset("assets/svgIcons/download.png"),
                 ),
@@ -222,18 +220,18 @@ class _RecentsPageState extends State<RecentsPage> {
     );
   }
 
-  Future<void> _downloadFile(String url) async {
+  Future<void> _downloadFile(String url, String title) async {
     Dio dio = Dio();
     Directory? downloadsDirectory;
 
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid){
       downloadsDirectory = await getExternalStorageDirectory();
-      if (downloadsDirectory != null) {
+      if (downloadsDirectory != null){
         final downloadPath = downloadsDirectory.path;
-        final fileName = url.split('/').last.split('?').first; // Extract a valid file name
-        final path = '$downloadPath/$fileName';
+        final fileName = url.split('/').last.split('?').first;
+        final path = '$downloadPath/$title';
 
-        try {
+        try{
           await dio.download(
             url,
             path,
@@ -247,7 +245,7 @@ class _RecentsPageState extends State<RecentsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Download completed: $path")),
           );
-        } catch (e) {
+        }catch(e){
           log("Error downloading: $e");
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Error downloading: $e")),

@@ -3,22 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/pages/CollegeDetails.dart';
 import 'package:untitled1/pages/HomePage.dart';
 import 'package:untitled1/pages/ProfilePage.dart';
-import 'package:untitled1/pages/about.dart';
-import 'package:untitled1/pages/admin.dart';
-import 'package:untitled1/pages/announcements.dart';
-import 'package:untitled1/pages/blank.dart';
-import 'package:untitled1/pages/downloads.dart';
-import 'package:untitled1/pages/home.dart';
 import 'package:untitled1/pages/landingPage.dart';
-import 'package:untitled1/pages/pdf.dart';
 import 'package:untitled1/pages/sem_vise_subjects.dart';
 import 'package:untitled1/pages/signin.dart';
 import 'package:untitled1/pages/splash_screen.dart';
-import 'package:untitled1/pages/SemisterAskingPage.dart';
 import 'package:untitled1/utils/Functions.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/utils/sharedpreferencesutil.dart';
-import 'package:untitled1/pages/subject.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -93,14 +84,13 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       // Define your routes here (remove the '/' entry since you have 'home')
       routes: {
-        '/home': (context) => Home(), // Route for your home screen
+        '/home': (context) => HomePage(), // Route for your home screen
         //'/signin': (context) => SignIn(),
         //'/about': (context) => AboutUs(),
         //'///admin': (context) => Admin(),
         //'/announcements': (context) => Announcements(),
-        '/downloads': (context) => Downloads(),
         // '/pdf': (context) => PDFScreen(),
-        '/semisterAskingPage': (context) => SemsiterAskingPage(),
+        // '/semisterAskingPage': (context) => SemsiterAskingPage(),
         //'/subject': (context) => Subject(), // You might need to adjust this based onhow you pass data to Subject
       },
       home: FutureBuilder(
@@ -110,7 +100,7 @@ class _MyAppState extends State<MyApp> {
             return snapshot.data! ? SplashScreen() : SplashScreen()
             ;
           } else {
-            return Blank();
+            return SplashScreen();
           }
         },
       ),
