@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled1/components/NetworkError.dart';
 import 'package:untitled1/pages/CollegeDetails.dart';
 import 'package:untitled1/pages/HomePage.dart';
 import 'package:untitled1/pages/ProfilePage.dart';

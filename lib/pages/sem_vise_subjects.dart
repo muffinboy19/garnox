@@ -5,24 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:untitled1/components/custom_helpr.dart';
 import 'package:untitled1/database/Apis.dart';
 import 'package:untitled1/pages/Subject_detail.dart';
 import 'package:untitled1/utils/contstants.dart';
 import 'package:untitled1/models/SemViseSubModel.dart';
-
 import '../components/Custom_navDrawer.dart';
 import '../models/SpecificSubjectModel.dart';
 import 'SearchPage.dart';
 
-class SemViseSubjects extends StatefulWidget {
+class SemViseSubjects extends StatefulWidget{
   const SemViseSubjects({super.key});
 
   @override
   State<SemViseSubjects> createState() => _SemViseSubjectsState();
 }
 
-class _SemViseSubjectsState extends State<SemViseSubjects> {
+class _SemViseSubjectsState extends State<SemViseSubjects>{
   bool _isSearching = false;
   String _searchText = "";
   final List<SemViseSubject> _searchList = [];
@@ -45,7 +45,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return RefreshIndicator(
       key: refreshKey,
       onRefresh: _handleRefresh,
@@ -138,6 +138,26 @@ class _SemViseSubjectsState extends State<SemViseSubjects> {
   }
 
   Widget _subCardList(List<String> eceList) {
+    if(eceList.isEmpty){
+      return Expanded(
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.only(top: 100,left: 50,right: 50),
+            width: double.infinity,
+            height: 600,
+            child: Center(
+              child: Column(
+                children: [
+                  Lottie.asset('assets/animation/nodatafound.json'),
+                  SizedBox(height: 20,),
+                  Container(width: double.infinity ,child: Center(child: Text("✏️ NO DATA FOUND!!" ,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.w600),))),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }else
     return Column(
       children: eceList.map((subName) {
         return _subCard(subName);

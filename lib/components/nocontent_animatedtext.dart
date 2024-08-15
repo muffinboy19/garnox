@@ -15,7 +15,7 @@ class NoContentAnimatedText extends StatelessWidget {
         },
         animatedTexts: [
           TyperAnimatedText(
-            "Oops😵",
+            "Oops😵 No Data Found",
             speed: Duration(milliseconds: 100),
             textStyle: TextStyle(
               fontSize: 25.0,
@@ -36,7 +36,7 @@ class NoContentAnimatedText extends StatelessWidget {
             ),
           ),
         ],
-        totalRepeatCount: 1,
+        repeatForever: true,
         pause: Duration(milliseconds: 1000),
         displayFullTextOnTap: true,
         stopPauseOnTap: true,

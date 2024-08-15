@@ -94,7 +94,7 @@ flutter:
   assets:
     - assets/svgIcons/
     - assets/images/
-    - assets/animation/joinus.json
+    - assets/animation/nodatafound.json
 
   fonts:
     - family: MontSerrat

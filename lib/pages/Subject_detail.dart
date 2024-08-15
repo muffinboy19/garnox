@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:untitled1/database/Apis.dart';
 import 'package:untitled1/database/Locals.dart';
 import 'package:untitled1/models/SpecificSubjectModel.dart';
@@ -137,11 +138,11 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
   Widget _buildTabContent(String type) {
     List<Widget> items = [];
     if (type == "material") {
-      items = widget.subject.material.map((item) => _subCard(item.title, item.contentURL ,"material")).toList();
+      items = widget.subject.material.map((item) => _subCard(item.title, item.contentURL ,"material",widget.subject.material.isEmpty)).toList();
     } else if (type == "papers") {
-      items = widget.subject.questionPapers.map((item) => _subCard(item.title, item.url ,"papers")).toList();
+      items = widget.subject.questionPapers.map((item) => _subCard(item.title, item.url ,"papers",widget.subject.questionPapers.isEmpty)).toList();
     } else if (type == "links") {
-      items = widget.subject.importantLinks.map((item) => _subCard(item.title, item.contentURL ,"links")).toList();
+      items = widget.subject.importantLinks.map((item) => _subCard(item.title, item.contentURL ,"links",widget.subject.importantLinks.isEmpty)).toList();
     } else {
       return Center(child: Text("No Data Found"));
     }
@@ -152,7 +153,14 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
     );
   }
 
-  Widget _subCard(String title, String link ,String type) {
+  Widget _subCard(String title, String link ,String type,bool check){
+    if(check){
+      return Column(
+        children: [
+          Container(width: double.infinity ,child: Center(child: Text("✏️ NO DATA FOUND!!" ,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.w500),))),
+        ],
+      );
+    }else
     return InkWell(
       onTap: () async{
           LOCALs.recents(title,link,type);

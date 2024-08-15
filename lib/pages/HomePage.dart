@@ -269,6 +269,11 @@ class _HomePageState extends State<HomePage> {
                                   );
                                 } else if (snapshot.hasData) {
                                   _list = snapshot.data!;
+                                  if(_list.isEmpty){
+                                     return Expanded(
+                                       child: Container(width: double.infinity ,child: Center(child: Text("✏️ NO DATA FOUND!!" ,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.w500),)))
+                                     );
+                                  }else
                                   return Expanded(
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.vertical,
@@ -299,6 +304,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _subCardList() {
+    if(eceList.isEmpty){
+      return Container(width: double.infinity ,child: Center(child: Text("✏️ NO DATA FOUND!!" ,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.w500),)));
+    }else
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(

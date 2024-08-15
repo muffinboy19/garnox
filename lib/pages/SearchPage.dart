@@ -5,6 +5,7 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 import '../components/Custom_navDrawer.dart';
 import '../components/custom_helpr.dart';
@@ -120,13 +121,31 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _searchList.length,
-                      itemBuilder: (context, index) {
-                        return _fileCard(_searchList[index]);
-                      },
-                    ),
+                  (_searchList.isEmpty)?
+                    Expanded(
+                      child: Center(
+                        child: Container(
+                          padding: EdgeInsets.only(top: 100,left: 50,right: 50),
+                          width: double.infinity,
+                          height: 600,
+                          child: Center(
+                            child: Column(
+                                children: [
+                                  Lottie.asset('assets/animation/nodatafound.json'),
+                                // Container(width: double.infinity ,child: Center(child: Text("✏️ NO DATA FOUND!!" ,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.w600),))),
+                                ],
+                              ),
+                          ),
+                        ),
+                      ),
+                    )
+                    :Expanded(
+                      child: ListView.builder(
+                        itemCount: _searchList.length,
+                        itemBuilder: (context, index) {
+                          return _fileCard(_searchList[index]);
+                        },
+                      ),
                   ),
                 ],
               ),
@@ -138,6 +157,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _fileCard(Recents temp) {
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 0),
       child: InkWell(

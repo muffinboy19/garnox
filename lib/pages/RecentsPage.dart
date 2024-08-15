@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import '../components/nocontent_animatedtext.dart';
 import '../database/Locals.dart';
 import '../models/recentsModel.dart';
 import '../utils/contstants.dart';
@@ -112,7 +113,10 @@ class _RecentsPageState extends State<RecentsPage> {
                   );
                 } else if (snapshot.hasData) {
                   _list = snapshot.data!;
-                  return Expanded(
+                  
+                  if(_list.isEmpty){
+                    return Expanded(child: NoContentAnimatedText());
+                  }else return Expanded(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
                       child: Column(
