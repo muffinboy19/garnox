@@ -100,8 +100,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     image: DecorationImage(
                                         image: imageProvider,
                                         fit: BoxFit.cover,
-                                        colorFilter:
-                                        ColorFilter.mode(Constants.APPCOLOUR, BlendMode.colorBurn)),
+                                        // colorFilter:
+                                        // ColorFilter.mode(Constants.APPCOLOUR, BlendMode.colorBurn)
+                                    ),
                                   ),
                                 ),
                                 placeholder: (context, url) => CircularProgressIndicator(),

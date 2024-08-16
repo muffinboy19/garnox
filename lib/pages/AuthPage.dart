@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:lottie/lottie.dart';
 import 'package:untitled1/pages/CollegeDetails.dart';
 import 'package:untitled1/pages/HomePage.dart';
 import '../components/custom_helpr.dart';
 import '../database/Apis.dart';
+import '../utils/contstants.dart';
 
 class Auth extends StatefulWidget {
   const Auth({super.key});
@@ -39,15 +41,23 @@ class _AuthState extends State<Auth> {
         log('\nUser: ${user.user}');
         log('\nUser Additional Info: ${user.additionalUserInfo}');
 
-        if ((await APIs.userExists())) {
-          log("hello hello");
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => const HomePage()));
-        }else{
-          APIs.createGoogleUser().then((value) => {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (_) => const CollegeDetails()))
-          });
+        final email = user.user?.email;
+        if (email != null && email.endsWith('@iiita.ac.in')) {
+          if ((await APIs.userExists())) {
+            log("User exists, navigating to HomePage");
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => const HomePage()));
+          } else {
+            APIs.createGoogleUser().then((value) => {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (_) => const CollegeDetails()))
+            });
+          }
+        } else {
+          log("Invalid email domain");
+          Dialogs.showSnackbar(context, "⚠️ Login Via Valid College Id!!");
+          await FirebaseAuth.instance.signOut();
+          await GoogleSignIn().signOut();
         }
       }
     });
@@ -81,52 +91,61 @@ class _AuthState extends State<Auth> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            AnimatedPositioned(
-              duration: const Duration(seconds: 1),
-              top: mq.height * .15,
-              right: _isAnimate ? mq.width * .15 : -mq.width * .5,
-              child: Container(
-                width: mq.width * .7,
-                child: Image.asset('assets/svgIcons/page2.png'),
+      body: Column(
+        children: [
+            SizedBox(height: 50,),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 30),
+              width: double.infinity,
+              height: 500,
+              child: Center(
+                child: Column(
+                  children: [
+                    Lottie.asset('assets/animation/aa.json', fit: BoxFit.cover),
+                  ],
+                ),
               ),
             ),
+            SizedBox(height: 40,),
+            Container(
+              width: double.infinity,
+              height: 60,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: ElevatedButton.icon(
 
-            //google login button
-            Positioned(
-                bottom: mq.height * .15,
-                left: mq.width * .05,
-                width: mq.width * .9,
-                height: mq.height * .06,
-                child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                        const Color.fromARGB(255, 223, 255, 187),
-                        shape: const StadiumBorder(),
-                        elevation: 1),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 223, 255, 187),
+                    shape: const StadiumBorder(),
+                    elevation: 1,
+                  ),
 
-                    // on tap
-                    onPressed: () {
-                      _handleGoogleBtnClick();
-                    },
+                  // on tap
+                  onPressed: () {
+                    _handleGoogleBtnClick();
+                  },
 
-                    //google icon
-                    icon: Image.asset('assets/images/google_logo.png',
-                        height: mq.height * .03),
+                  //google icon
+                  icon: Image.asset('assets/images/google_logo.png',
+                    height: mq.height * .03,
+                  ),
 
-                    //login with google label
-                    label: RichText(
-                      text: const TextSpan(
-                          style: TextStyle(color: Colors.black, fontSize: 16),
-                          children: [
-                            TextSpan(text: 'Login with '),
-                            TextSpan(
-                                text: 'Google',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
-                          ]),
-                    ))),
-          ],
-        ));
+              //login with google label
+              label: RichText(
+                  text: const TextSpan(
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  children: [
+                    TextSpan(text: 'Login with '),
+                    TextSpan(
+                    text: 'Google',
+                    style: TextStyle(fontWeight: FontWeight.w500)
+                    ),
+                  ],
+                ),
+               ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

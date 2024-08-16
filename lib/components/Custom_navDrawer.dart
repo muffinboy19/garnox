@@ -82,24 +82,33 @@ class _CustomNavDrawerState extends State<CustomNavDrawer> {
             _list(Icons.support_agent_outlined, "Support", (){}),
             _list(Icons.logout_outlined, "Sign out", ()async{ await APIs.Signout(); Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>Auth()), (route) => false,);}),
             Spacer(),
-            Divider(),
-            _list(Icons.question_mark_sharp, "Colour Scheme", (){}),
-            ToggleSwitch(
-              minWidth: 90.0,
-              initialLabelIndex: 1,
-              cornerRadius: 20.0,
-              activeFgColor: Colors.black,
-              inactiveBgColor: Colors.white,
-              inactiveFgColor: Colors.black,
-              totalSwitches: 2,
-              labels: ['Light', 'Dark'],
-              icons: [Icons.sunny, Icons.nights_stay_outlined],
-              activeBgColors: [[Color(0x535763)],[Constants.searchBarColour]],
-              onToggle: (index) {
-                print('switched to: $index');
-              },
+            Text(
+              'Made with ❤️ By Geek Heaven',
+              style: GoogleFonts.epilogue(
+                textStyle: TextStyle(
+                  fontSize: 15,
+                  color: Constants.BLACK,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            SizedBox(height: 10,)
+            // _list(Icons.question_mark_sharp, "Colour Scheme", (){}),
+            // ToggleSwitch(
+            //   minWidth: 90.0,
+            //   initialLabelIndex: 1,
+            //   cornerRadius: 20.0,
+            //   activeFgColor: Colors.black,
+            //   inactiveBgColor: Colors.white,
+            //   inactiveFgColor: Colors.black,
+            //   totalSwitches: 2,
+            //   labels: ['Light', 'Dark'],
+            //   icons: [Icons.sunny, Icons.nights_stay_outlined],
+            //   activeBgColors: [[Color(0x535763)],[Constants.searchBarColour]],
+            //   onToggle: (index) {
+            //     print('switched to: $index');
+            //   },
+            // ),
+            SizedBox(height: 50,)
           ],
         ),
       );

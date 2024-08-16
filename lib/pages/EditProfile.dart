@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:untitled1/components/custom_helpr.dart';
 import 'package:untitled1/pages/ProfilePage.dart';
 import 'package:untitled1/utils/contstants.dart';
 
@@ -147,8 +148,9 @@ class _EditProfileState extends State<EditProfile> {
                                     image: DecorationImage(
                                         image: imageProvider,
                                         fit: BoxFit.cover,
-                                        colorFilter:
-                                        ColorFilter.mode(Constants.APPCOLOUR, BlendMode.colorBurn)),
+                                        // colorFilter:
+                                        // ColorFilter.mode(Constants.WHITE)
+                                    ),
                                   ),
                                 ),
                                 placeholder: (context, url) => CircularProgressIndicator(),
@@ -373,30 +375,23 @@ class _EditProfileState extends State<EditProfile> {
                             // Dismiss the progress indicator
                             Navigator.pop(context);
 
+                            // Show a success message using Snackbar
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Profile updated successfully!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+
                           } catch (error) {
                             // Dismiss the progress indicator
                             Navigator.pop(context);
 
-                            // Show an error message
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Error'),
-                                  content: Text(error.toString()),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                            // Show an error message using Snackbar
+                            Dialogs.showSnackbar(context, "⚠️ Oops! Check Your Internet Connection");
                           }
                         },
+
                         child: Text(
                           "Upload",
                           style: TextStyle(color: Constants.WHITE, fontSize: 20),

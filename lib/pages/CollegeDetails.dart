@@ -25,7 +25,7 @@ class _CollegeDetailsState extends State<CollegeDetails> with TickerProviderStat
 
   var branchitems = [
     'IT',
-    'IT-BI',
+    'ITBI',
     'ECE',
   ];
 
