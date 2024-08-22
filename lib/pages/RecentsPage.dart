@@ -5,8 +5,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart'; // Added for clipboard functionality
+import 'package:url_launcher/url_launcher.dart'; // Added for launching URLs
+import '../components/custom_helpr.dart';
 import '../components/nocontent_animatedtext.dart';
 import '../database/Locals.dart';
 import '../models/recentsModel.dart';
@@ -113,19 +115,21 @@ class _RecentsPageState extends State<RecentsPage> {
                   );
                 } else if (snapshot.hasData) {
                   _list = snapshot.data!;
-                  
-                  if(_list.isEmpty){
+
+                  if (_list.isEmpty) {
                     return Expanded(child: NoContentAnimatedText());
-                  }else return Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        children: _list.map((subName) {
-                          return _fileCard(subName);
-                        }).toList(),
+                  } else {
+                    return Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: _list.map((subName) {
+                            return _fileCard(subName);
+                          }).toList(),
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                 } else {
                   return Center(
                     child: Text("No Files Found"),
@@ -151,7 +155,8 @@ class _RecentsPageState extends State<RecentsPage> {
                 "assets/svgIcons/file.svg",
               ),
               onPressed: () {
-                // Handle drawer opening
+                log("File icon pressed");
+                // Handle file icon pressed action
               },
             ),
             title: Text(
@@ -163,11 +168,48 @@ class _RecentsPageState extends State<RecentsPage> {
                 ),
               ),
             ),
-            trailing: IconButton(
-              onPressed: () {
-                _showBottomSheet(temp.URL , temp.Title);
-              },
-              icon: Icon(Icons.more_vert),
+            trailing: Container(
+              constraints: BoxConstraints(maxWidth: 40), // Ensure the trailing icon is properly sized
+              child: PopupMenuButton<String>(
+                onSelected: (value) async {
+                  log("Popup menu item selected: $value");
+                  switch (value) {
+                    case 'share':
+                      log("Copying link to clipboard");
+                      Clipboard.setData(ClipboardData(text: temp.URL));
+                      Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
+                      break;
+                    case 'download':
+                      log("Download selected");
+                      Clipboard.setData(ClipboardData(text: temp.URL));
+                      Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
+                      await _showDownloadInstructions(temp.URL);
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  log("Building popup menu items");
+                  return [
+                    PopupMenuItem(
+                      value: 'share',
+                      child: ListTile(
+                        leading: Icon(Icons.share, color: Constants.APPCOLOUR),
+                        title: Text("Share"),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'download',
+                      child: ListTile(
+                        leading: Icon(Icons.download_sharp, color: Constants.APPCOLOUR),
+                        title: Text("Download"),
+                      ),
+                    ),
+                  ];
+                },
+                onCanceled: () {
+                  log("Popup menu canceled");
+                },
+              ),
             ),
           ),
         ),
@@ -175,48 +217,31 @@ class _RecentsPageState extends State<RecentsPage> {
     );
   }
 
-  void _showBottomSheet(String url , String title) {
-    var mq = MediaQuery.of(context).size;
-    showModalBottomSheet(
+  Future<void> _showDownloadInstructions(String url) async {
+    showDialog(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      builder: (_) {
-        return ListView(
-          shrinkWrap: true,
-          padding: EdgeInsets.only(top: mq.height * .01, bottom: mq.height * .05),
-          children: [
-            Divider(indent: 50, endIndent: 50, color: Colors.grey, thickness: 5),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    backgroundColor: Colors.white,
-                    fixedSize: Size(mq.width * .3, mq.height * .15),
-                  ),
-                  onPressed: () async {},
-                  child: SvgPicture.asset("assets/svgIcons/file.svg"),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    backgroundColor: Colors.white,
-                    fixedSize: Size(mq.width * .3, mq.height * .15),
-                  ),
-                  onPressed: () async {
-                    log("${url}");
-                    await _downloadFile(url,title);
-                  },
-                  child: Image.asset("assets/svgIcons/download.png"),
-                ),
-              ],
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text('Download Instructions'),
+          content: Text(
+            'To download the PDF, please follow these steps:\n\n'
+                '1. Open the Copied link in your browser:\n'
+                '$url\n\n'
+                '2. Log in with your college account: xxxxxxxxxx@iiita.ac.in\n\n'
+                '3. Once logged in, you will be able to download the file.',
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            side: BorderSide(color: Colors.black, width: 2.0),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _openInBrowser(url);
+              },
             ),
           ],
         );
@@ -224,64 +249,15 @@ class _RecentsPageState extends State<RecentsPage> {
     );
   }
 
-  Future<void> _downloadFile(String url, String title) async {
-    Dio dio = Dio();
-    Directory? downloadsDirectory;
-
-    if (Platform.isAndroid){
-      downloadsDirectory = await getExternalStorageDirectory();
-      if (downloadsDirectory != null){
-        final downloadPath = downloadsDirectory.path;
-        final fileName = url.split('/').last.split('?').first;
-        final path = '$downloadPath/$title';
-
-        try{
-          await dio.download(
-            url,
-            path,
-            onReceiveProgress: (received, total) {
-              if (total != -1) {
-                log("Download progress: ${(received / total * 100).toStringAsFixed(0)}%");
-              }
-            },
-          );
-          log("Downloaded to: $path");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Download completed: $path")),
-          );
-        }catch(e){
-          log("Error downloading: $e");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error downloading: $e")),
-          );
-        }
+  Future<void> _openInBrowser(String url) async {
+    try {
+      if (await canLaunch(url)) {
+        await launch(url, forceSafariVC: false, forceWebView: false); // Open in default browser (Chrome)
+        log("URL opened in browser");
+      } else {
       }
-    } else {
-      downloadsDirectory = await getApplicationDocumentsDirectory();
-      if (downloadsDirectory != null) {
-        final path = '${downloadsDirectory.path}/${url.split('/').last}';
-        try {
-          await dio.download(
-            url,
-            path,
-            onReceiveProgress: (received, total) {
-              if (total != -1) {
-                log("Download progress: ${(received / total * 100).toStringAsFixed(0)}%");
-              }
-            },
-          );
-          log("Downloaded to: $path");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Download completed: $path")),
-          );
-        } catch (e) {
-          log("Error downloading: $e");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error downloading: $e")),
-          );
-        }
-      }
+    } catch (e) {
+      log("Error opening URL: $e");
     }
   }
-
 }

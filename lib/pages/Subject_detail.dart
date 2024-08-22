@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
@@ -7,7 +10,9 @@ import 'package:untitled1/database/Locals.dart';
 import 'package:untitled1/models/SpecificSubjectModel.dart';
 import 'package:untitled1/pages/OpenPdf.dart';
 import 'package:untitled1/utils/contstants.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../components/custom_helpr.dart';
+import '../models/recentsModel.dart';
 import 'SearchPage.dart';
 
 class SubjectDetail extends StatefulWidget {
@@ -196,13 +201,96 @@ class _SubjectDetailState extends State<SubjectDetail> with SingleTickerProvider
                 ),
               ),
             ),
-            trailing: IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.more_vert),
+            trailing: Container(
+              constraints: BoxConstraints(maxWidth: 40), // Ensure the trailing icon is properly sized
+              child: PopupMenuButton<String>(
+                onSelected: (value) async {
+                  log("Popup menu item selected: $value");
+                  switch (value) {
+                    case 'share':
+                      log("Copying link to clipboard");
+                      Clipboard.setData(ClipboardData(text: link));
+                      Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
+                      break;
+                    case 'download':
+                      log("Download selected");
+                      Clipboard.setData(ClipboardData(text: link));
+                      Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
+                      await _showDownloadInstructions(link);
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  log("Building popup menu items");
+                  return [
+                    PopupMenuItem(
+                      value: 'share',
+                      child: ListTile(
+                        leading: Icon(Icons.share, color: Constants.APPCOLOUR),
+                        title: Text("Share"),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'download',
+                      child: ListTile(
+                        leading: Icon(Icons.download_sharp, color: Constants.APPCOLOUR),
+                        title: Text("Download"),
+                      ),
+                    ),
+                  ];
+                },
+                onCanceled: () {
+                  log("Popup menu canceled");
+                },
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _showDownloadInstructions(String url) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text('Download Instructions'),
+          content: Text(
+            'To download the PDF, please follow these steps:\n\n'
+                '1. Open the Copied link in your browser:\n'
+                '$url\n\n'
+                '2. Log in with your college account: xxxxxxxxxx@iiita.ac.in\n\n'
+                '3. Once logged in, you will be able to download the file.',
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            side: BorderSide(color: Colors.black, width: 2.0),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _openInBrowser(url);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _openInBrowser(String url) async {
+    try {
+      if (await canLaunch(url)) {
+        await launch(url, forceSafariVC: false,
+            forceWebView: false); // Open in default browser (Chrome)
+        // log("URL opened in browser");
+      } else {}
+    } catch (e) {
+      // log("Error opening URL: $e");
+    }
   }
 }

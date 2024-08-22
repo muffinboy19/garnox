@@ -97,18 +97,18 @@ flutter:
     - assets/animation/nodatafound.json
     - assets/animation/aa.json
 
-  fonts:
-    - family: MontSerrat
-      fonts:
-        - asset: assets/fonts/Montserrat-Italic.ttf
-        - asset: assets/fonts/Montserrat-Medium.ttf
-          weight: 600
-        - asset: assets/fonts/Montserrat-MediumItalic.ttf
-        - asset: assets/fonts/Montserrat-Regular.ttf
-          weight: 500
-    - family: Yellowtail
-      fonts:
-        - asset: assets/fonts/Yellowtail-Regular.ttf
+#  fonts:
+#    - family: MontSerrat
+#      fonts:
+#        - asset: assets/fonts/Montserrat-Italic.ttf
+#        - asset: assets/fonts/Montserrat-Medium.ttf
+#          weight: 600
+#        - asset: assets/fonts/Montserrat-MediumItalic.ttf
+#        - asset: assets/fonts/Montserrat-Regular.ttf
+#          weight: 500
+#    - family: Yellowtail
+#      fonts:
+#        - asset: assets/fonts/Yellowtail-Regular.ttf
     #- family: RobotoMono
     #  fonts:
     #    - asset: fonts/RobotoMono-Regular.ttf
