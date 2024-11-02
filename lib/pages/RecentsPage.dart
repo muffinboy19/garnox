@@ -13,6 +13,9 @@ import '../components/nocontent_animatedtext.dart';
 import '../database/Locals.dart';
 import '../models/recentsModel.dart';
 import '../utils/contstants.dart';
+import 'package:share_plus/share_plus.dart';
+
+import 'OpenPdf.dart';
 
 class RecentsPage extends StatefulWidget {
   const RecentsPage({super.key});
@@ -147,7 +150,11 @@ class _RecentsPageState extends State<RecentsPage> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 0),
       child: InkWell(
-        onTap: () async {},
+        onTap: () async {
+          if(temp.Type == "material" || temp.Type == "papers"){
+            Navigator.push(context, MaterialPageRoute(builder: (_)=>OpenPdf(link: temp.URL)));
+          }
+        },
         child: Card(
           child: ListTile(
             leading: IconButton(
@@ -175,12 +182,13 @@ class _RecentsPageState extends State<RecentsPage> {
                   log("Popup menu item selected: $value");
                   switch (value) {
                     case 'share':
-                      log("Copying link to clipboard");
-                      Clipboard.setData(ClipboardData(text: temp.URL));
-                      Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
+                      // log("Copying link to clipboard");
+                      Share.share("Here is the Url of ${temp.Title} \n ${temp.URL}");
+                      // Clipboard.setData(ClipboardData(text: temp.URL));
+                      // Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
                       break;
                     case 'download':
-                      log("Download selected");
+                      // log("Download selected");
                       Clipboard.setData(ClipboardData(text: temp.URL));
                       Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
                       await _showDownloadInstructions(temp.URL);

@@ -117,7 +117,7 @@ class _SemViseSubjectsState extends State<SemViseSubjects>{
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      "Semister ${APIs.me!.semester}",
+                      "Semester ${APIs.me!.semester}",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

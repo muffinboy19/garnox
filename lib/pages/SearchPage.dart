@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
@@ -7,8 +6,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../components/Custom_navDrawer.dart';
 import '../components/custom_helpr.dart';
 import '../database/Locals.dart';
@@ -164,7 +163,8 @@ class _SearchPageState extends State<SearchPage> {
       padding: EdgeInsets.symmetric(horizontal: 0),
       child: InkWell(
         onTap: () {
-          log("${temp.Type}");
+          LOCALs.recents(temp.Title,temp.URL,temp.URL);
+          // log("${temp.Type}");
           if (temp.Type == "material" || temp.Type == "papers") {
             Navigator.push(context, MaterialPageRoute(builder: (_) => OpenPdf(link: temp.URL)));
           } else {
@@ -200,9 +200,7 @@ class _SearchPageState extends State<SearchPage> {
                   log("Popup menu item selected: $value");
                   switch (value) {
                     case 'share':
-                      log("Copying link to clipboard");
-                      Clipboard.setData(ClipboardData(text: temp.URL));
-                      Dialogs.showSnackbar(context, "🔗 Link copied to clipboard!");
+                      Share.share("Here is the Url of ${temp.Title} \n ${temp.URL}");
                       break;
                     case 'download':
                       log("Download selected");

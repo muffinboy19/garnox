@@ -59,7 +59,7 @@ class _EditProfileState extends State<EditProfile> {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.dark, // Light or dark depending on background color
+      statusBarIconBrightness: Brightness.light, // Light or dark depending on background color
     ));
   }
 

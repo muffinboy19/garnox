@@ -53,10 +53,10 @@ class _CollegeDetailsState extends State<CollegeDetails> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.dark, // Light or dark depending on background color
-    ));
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //   statusBarColor: Colors.white,
+    //   statusBarIconBrightness: Brightness.dark, // Light or dark depending on background color
+    // ));
 
     // Animation 1
     _controller1 = AnimationController(

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:share/share.dart';
 import 'package:untitled1/pages/SearchPage.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -79,230 +80,190 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      key: refreshKey,
-      onRefresh: _handleRefresh,
-
-      child: FutureBuilder(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          'HomePage',
+          style: GoogleFonts.epilogue(
+            textStyle: TextStyle(
+              color: Constants.BLACK,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: SvgPicture.asset(
+              "assets/svgIcons/hamburger.svg",
+              color: Constants.BLACK,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              "assets/svgIcons/notification.svg",
+              color: Constants.BLACK,
+            ),
+            onPressed: () {
+              Dialogs.showSnackbar(context, "Oops! 😞 No Notification to Show");
+            },
+          ),
+        ],
+      ),
+      drawer: CustomNavDrawer(),
+      body: FutureBuilder(
         future: _initializeData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(
-                // child: CircularProgressIndicator(),
-                child: _buildShimmer(),
-              ),
+            return Center(
+              child: _buildShimmer(),
             );
           } else if (snapshot.hasError) {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(
-                child: Text("Error: ${snapshot.error}"),
-              ),
+            return Center(
+              child: Text("Error: ${snapshot.error}"),
             );
           } else {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              // drawerEnableOpenDragGesture: false,
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                elevation: 0,
-                title: Text(
-                  'HomePage',
-                  style: GoogleFonts.epilogue(
-                    textStyle: TextStyle(
-                      color: Constants.BLACK,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                leading: IconButton(
-                  icon: SvgPicture.asset(
-                    "assets/svgIcons/hamburger.svg",
-                    color: Constants.BLACK,
-                  ),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                ),
-                actions: [
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      "assets/svgIcons/notification.svg",
-                      color: Constants.BLACK,
-                    ),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-              drawer: CustomNavDrawer(),
-              body: GestureDetector(
-                onTap: () => Focus.of(context).unfocus(),
-                child: WillPopScope(
-                  onWillPop: () {
-                    if (issearch) {
-                      // setState(() {
-                      //     issearch = false;
-                      //   _searchList.clear();
-                      // });
-                      return Future.value(false);
-                    } else {
-                      return Future.value(true);
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: ListTile(
-                            leading: Icon(Icons.search),
-                            title: Text("Search Subject..."),
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                  builder: (_) => SearchPage()));
-                            },
+            return RefreshIndicator(
+              onRefresh: _handleRefresh,
+              child: WillPopScope(
+                onWillPop: () {
+                  if (issearch) {
+                    return Future.value(false);
+                  } else {
+                    return Future.value(true);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5.0),
+                        child: ListTile(
+                          leading: Icon(Icons.search),
+                          title: Text("Search Subject..."),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (_) => SearchPage()));
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        "Subjects",
+                        style: GoogleFonts.epilogue(
+                          textStyle: TextStyle(
+                            color: Constants.BLACK,
+                            fontWeight: FontWeight.bold,
                           ),
+                          fontSize: 25,
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 16.0),
-                        //   child: InkWell(
-                        //     onTap: (){
-                        //       setState(() {
-                        //       });
-                        //     },
-                        //     child: Container(
-                        //       height: 50,
-                        //       width: double.infinity,
-                        //       child: Text("Search Subject here"),
-                        //     ),
-                        //   )
-                        // ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Subjects",
-                          style: GoogleFonts.epilogue(
-                            textStyle: TextStyle(
-                              color: Constants.BLACK,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            fontSize: 25,
+                      ),
+                      Expanded(child: _subCardList()),
+                      Text(
+                        "My Files",
+                        style: GoogleFonts.epilogue(
+                          textStyle: TextStyle(
+                            color: Constants.BLACK,
+                            fontWeight: FontWeight.bold,
                           ),
+                          fontSize: 25,
                         ),
-                        Expanded(
-                            child: _subCardList()
-                        ),
-                        // SingleChildScrollView(
-                        //   child: Column(
-                        //     children: [
-                        //       ListView.builder(
-                        //         physics: NeverScrollableScrollPhysics(),
-                        //         shrinkWrap: true,
-                        //         itemCount: _searchList.length,
-                        //         itemBuilder: (context, index) {
-                        //           return _fileCard(_searchList[index]);
-                        //         },
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        Text(
-                          "My Files",
-                          style: GoogleFonts.epilogue(
-                            textStyle: TextStyle(
-                              color: Constants.BLACK,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            fontSize: 25,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black),
-                                  // Add black border
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(50)),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(50)),
-                                  child: Container(
-                                    height: 25,
-                                    width: 120,
-                                    child: Center(
-                                      child: Text(
-                                        "Recently used ￬",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black),
+                                borderRadius: BorderRadius.all(Radius.circular(50)),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.all(Radius.circular(50)),
+                                child: Container(
+                                  height: 25,
+                                  width: 120,
+                                  child: Center(
+                                    child: Text(
+                                      "Recently used ￬",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500),
                                     ),
                                   ),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (_) => RecentsPage()));
-                                },
-                                child: Text(
-                                  "See all",
-                                  style: TextStyle(color: Colors.blue),
-                                ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (_) => RecentsPage()));
+                              },
+                              child: Text(
+                                "See all",
+                                style: TextStyle(color: Colors.blue),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        FutureBuilder(
-                          future: LOCALs.fetchRecents(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text("Error: ${snapshot.error}"),
-                              );
-                            } else if (snapshot.hasData) {
-                              _list = snapshot.data!;
-                              if (_list.isEmpty) {
-                                return Expanded(
-                                    child: Container(width: double.infinity,
-                                        child: Center(child: Text(
-                                          "✏️ NO DATA FOUND!!",
-                                          style: TextStyle(color: Colors.black,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500),)))
-                                );
-                              } else
-                                return Expanded(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: Column(
-                                      children: _list.map((subName) {
-                                        return _fileCard(subName);
-                                      }).toList(),
+                      ),
+                      FutureBuilder(
+                        future: LOCALs.fetchRecents(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text("Error: ${snapshot.error}"),
+                            );
+                          } else if (snapshot.hasData) {
+                            _list = snapshot.data!;
+                            if (_list.isEmpty) {
+                              return Expanded(
+                                child: Container(
+                                  width: double.infinity,
+                                  child: Center(
+                                    child: Text(
+                                      "✏️ NO DATA FOUND!!",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500),
                                     ),
                                   ),
-                                );
+                                ),
+                              );
                             } else {
-                              return Center(
-                                child: Text("No Files Found"),
+                              return Expanded(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Column(
+                                    children: _list.map((subName) {
+                                      return _fileCard(subName);
+                                    }).toList(),
+                                  ),
+                                ),
                               );
                             }
-                          },
-                        )
-                      ],
-                    ),
+                          } else {
+                            return Center(
+                              child: Text("No Files Found"),
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -432,7 +393,11 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 0),
       child: InkWell(
-        onTap: () async {},
+        onTap: () async {
+          if(temp.Type == "material" || temp.Type == "papers"){
+            Navigator.push(context, MaterialPageRoute(builder: (_)=>OpenPdf(link: temp.URL)));
+          }
+        },
         child: Card(
           child: ListTile(
             leading: IconButton(
@@ -462,9 +427,7 @@ class _HomePageState extends State<HomePage> {
                   switch (value) {
                     case 'share':
                     // log("Copying link to clipboard");
-                      Clipboard.setData(ClipboardData(text: temp.URL));
-                      Dialogs.showSnackbar(
-                          context, "🔗 Link copied to clipboard!");
+                      Share.share("Here is the Url of ${temp.Title} \n ${temp.URL}");
                       break;
                     case 'download':
                     // log("Download selected");
@@ -767,7 +730,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildFileShimmer() {
     return Column(
-      children: List.generate(3, (index) =>
+      children: List.generate(2, (index) =>
           Padding(
             padding: EdgeInsets.symmetric(vertical: 5.0),
             child: Shimmer.fromColors(

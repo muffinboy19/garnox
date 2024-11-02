@@ -23,10 +23,10 @@ class _DeveloperPageState extends State<DeveloperPage> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.dark, // Light or dark depending on background color
-    ));
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //   statusBarColor: Colors.white,
+    //   statusBarIconBrightness: Brightness.dark, // Light or dark depending on background color
+    // ));
 
     // Initialize Animation 1
     _controller1 = AnimationController(
@@ -142,7 +142,7 @@ class _DeveloperPageState extends State<DeveloperPage> with TickerProviderStateM
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _devimage(url, "Lord Naitik", "Tech Lead"),
-                        _devimage(url, "Yojit Kapoor", "Manager"),
+                        _devimage(url, "Mokshe", "Manager"),
                       ],
                     ),
                   ),
@@ -152,8 +152,8 @@ class _DeveloperPageState extends State<DeveloperPage> with TickerProviderStateM
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _devimage(url, "Mukund Narayan Jha", "UI/UX Designer"),
-                        _devimage(url, "Vansh Dhawan", "Pole Dancer"),
+                        _devimage(url, "Pratham", "UI/UX Designer"),
+                        _devimage(url, "Vansh Dhawan", "Tech leaderr"),
                       ],
                     ),
                   )
@@ -274,6 +274,7 @@ class _DeveloperPageState extends State<DeveloperPage> with TickerProviderStateM
                 padding:  EdgeInsets.symmetric(horizontal: 10,vertical: 10),
                 child: Text(
                   'Made with ❤️ By Geek Heaven',
+                  // "",
                   style: GoogleFonts.epilogue(
                     textStyle: TextStyle(
                       fontSize: 15,

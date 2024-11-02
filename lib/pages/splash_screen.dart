@@ -26,8 +26,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive); // Hide status bar
-
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Constants.APPCOLOUR,
+    ));
     // Navigate after 4 seconds
     Future.delayed(Duration(seconds: 4), () {
        _navigateToNextScreen();

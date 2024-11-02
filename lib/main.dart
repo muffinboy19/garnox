@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:untitled1/components/NetworkError.dart';
 import 'package:untitled1/pages/CollegeDetails.dart';
 import 'package:untitled1/pages/HomePage.dart';
@@ -48,6 +49,11 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    // Set the status bar color to blue
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+    ));
+
     firebaseMessaging = FirebaseMessaging.instance;
     firebaseMessaging.subscribeToTopic('notifications');
   }
@@ -73,7 +79,7 @@ class _MyAppState extends State<MyApp> {
         ),
         pageTransitionsTheme: PageTransitionsTheme(
           builders: {
-            TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
+            TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           },
         ),

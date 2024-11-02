@@ -28,6 +28,12 @@ class APIs {
           .collection('Subjects')
           .get();
 
+      // Convert each document's data into a plain Map and then into a list
+      List<Map<String, dynamic>> allData = querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+
+      // Log the whole JSON response
+      log("Complete JSON Data: ${jsonEncode(allData)}");
+
       querySnapshot.docs.forEach((doc) async {
         try {
           var jsonData = doc.data();
@@ -93,7 +99,6 @@ class APIs {
     try {
       String? stringOfItems = await storage.read(key: "me");
       if (stringOfItems != null) {
-        log("Allah ho Akbar");
         Map<String, dynamic> jsonData = jsonDecode(stringOfItems);
         me = ChatUser.fromJson(jsonData);
         log("Hey this is me: ${me}");
@@ -108,7 +113,7 @@ class APIs {
         log("Heisenburg");
         Map<String, dynamic> jsonData = jsonDecode(stringofsemSubjectName);
         semSubjectName = SemViseSubject.fromJson(jsonData);
-        log("Hey this is SemSubjectName : ${semSubjectName}");
+        log(jsonEncode(semSubjectName));
       } else {
         await fetchSemSubjectName();
       }
